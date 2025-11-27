@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
-    header('Location:http://localhost/caplog1');
+    header('Location:https://log1.imarketph.com');
     exit();
 }
 include '../layout/adminLayout.php';
@@ -111,7 +111,7 @@ $children = <<<'HTML'
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
-        header('Location:http://localhost/caplog1');
+        header('Location:https://log1.imarketph.com');
         exit();
 }
 include '../layout/adminLayout.php';

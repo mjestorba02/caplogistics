@@ -2,7 +2,7 @@
 session_start(); 
 
 if (!isset($_SESSION['id'])) {
-    header('Location:http://localhost/caplog1');
+    header('Location:https://log1.imarketph.com');
     exit();
 }
 include '../layout/adminLayout.php';
@@ -86,7 +86,7 @@ $children = <<<'HTML'
 
 <script>
 (function(){
-    const API_URL = 'http://localhost/caplog1/api/assets.php';
+    const API_URL = 'https://log1.imarketph.com/api/assets.php';
 
     const grid = document.getElementById('assetsGrid');
     const addBtn = document.getElementById('addBtn');

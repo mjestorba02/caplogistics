@@ -2,7 +2,7 @@
 session_start(); 
 
 if (!isset($_SESSION['id'])) {
-    header('Location:http://localhost/caplog1');
+    header('Location:https://log1.imarketph.com');
     exit();
 }
 
@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         const userId = <?php echo $userId; ?>;
-        const apiUrl = `http://localhost/caplog1/api/users.php?id=${userId}`;
+        const apiUrl = `https://log1.imarketph.com/api/users.php?id=${userId}`;
 
         try {
             const response = await fetch(apiUrl, {

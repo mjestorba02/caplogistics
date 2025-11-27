@@ -304,11 +304,11 @@ window.addEventListener('click', e => {
 // Logout
 async function logoutUser() {
     try {
-        const res = await fetch('http://localhost/caplog1/api/logout.php', { method: 'POST' });
+        const res = await fetch('https://log1.imarketph.com/api/logout.php', { method: 'POST' });
         const data = await res.json();
         Toastify({ text: data.message || 'Logged out', duration: 3000 }).showToast();
         if (data.status === 'success') {
-            setTimeout(() => window.location.href = 'http://localhost/caplog1', 1000);
+            setTimeout(() => window.location.href = 'https://log1.imarketph.com', 1000);
         }
     } catch (e) {
         console.error(e);
