@@ -54,23 +54,40 @@ function adminLayout($children) {
   <ul class="nav-list flex-1 mt-4 px-2 overflow-y-auto" style="max-height: 80vh;">
     <?php 
     $modules = [
-      ['title'=>'Dashboard','icon'=>'bx-grid-alt','link'=>'dashboard.php','subs'=>[]],
+      ['title'=>'Dashboard','icon'=>'bx-grid-alt','link'=>'warehouse_analytics.php','subs'=>[]],
       [
-    'title' => 'Warehousing',
+    'title' => 'Smart Warehousing',
     'icon' => 'bx-package',
     'subs' => [
-      ['title' => 'Inventory & Stock Control', 'link' => 'inventory.php'],
-      ['title' => 'Shipments & Movements', 'link' => 'shipments.php'],
-      ['title' => 'Alerts & Analytics', 'link' => 'warehouse_analytics.php'],
+      ['title' => 'Inbound Logistics (Receiving & Putaway)', 'link' => 'inbound_logistics.php'],
+      ['title' => 'Storage & Inventory Management', 'link' => 'storage_inventory.php'],
+      ['title' => 'Outbound Logistics (Dispatch & Shipping)', 'link' => 'outbound_logistics.php'],
+      ['title' => 'Returns Management (Reverse Logistics)', 'link' => 'returns_management.php'],
     ]
   ],
   [
     'title' => 'Procurement',
     'icon' => 'bx-purchase-tag-alt',
     'subs' => [
-      ['title' => 'Purchase Management', 'link' => 'purchase_management.php'],
-      ['title' => 'Supplier & Bidding', 'link' => 'suppliers_bidding.php'],
-      ['title' => 'Contracts & Reports', 'link' => 'procurement_reports.php'],
+      ['title' => 'Supplier Identification & Pre-Qualification', 'link' => 'supplier_identification.php'],
+      ['title' => 'Supplier Evaluation & Selection', 'link' => 'supplier_evaluation.php'],
+      ['title' => 'Procurement Planning & Requisition', 'link' => 'procurement_planning.php'],
+      ['title' => 'Purchase Order (PO) Management', 'link' => 'po_management.php'],
+      ['title' => 'Receiving & Quality Assurance', 'link' => 'receiving_quality.php'],
+      ['title' => 'Supplier Relationship Management', 'link' => 'supplier_relationship.php'],
+      ['title' => 'Payment & Compliance', 'link' => 'payment_compliance.php'],
+      ['title' => 'Procurement Reports & Contracts', 'link' => 'procurement_reports.php'],
+    ]
+  ],
+  [
+    'title' => 'Asset Lifecycle & Maintenance',
+    'icon' => 'bx-recycle',
+    'subs' => [
+      ['title' => 'Receiving & Logistics Intake', 'link' => 'asset_receiving_logistics.php'],
+      ['title' => 'Onboarding & Registration', 'link' => 'asset_onboarding_registration.php'],
+      ['title' => 'Deployment & Operational Life', 'link' => 'asset_deployment_lifecycle.php'],
+      ['title' => 'Maintenance & Servicing', 'link' => 'asset_maintenance_servicing.php'],
+      ['title' => 'End-of-Life & Disposal', 'link' => 'asset_end_of_life_disposal.php'],
     ]
   ],
   [
@@ -79,7 +96,7 @@ function adminLayout($children) {
     'subs' => [
       ['title' => 'Shipments & Deliveries', 'link' => 'deliveries.php'],
       ['title' => 'Milestones & Status Updates', 'link' => 'milestones.php'],
-      ['title' => 'Logistics Performance', 'link' => 'logistics_performance.php'],
+      // ['title' => 'Logistics Performance', 'link' => 'logistics_performance.php'],
     ]
   ],
   [
@@ -96,13 +113,26 @@ function adminLayout($children) {
     'icon' => 'bx-folder',
     'subs' => [
       ['title' => 'Document Management', 'link' => 'documents.php'],
-      ['title' => 'Audit & Reporting', 'link' => 'audit_reporting.php'],
-      ['title' => 'Archives & Search', 'link' => 'archives.php'],
+      // ['title' => 'Audit & Reporting', 'link' => 'audit_reporting.php'],
+      // ['title' => 'Archives & Search', 'link' => 'archives.php'],
     ]
+    ],
+    [
+      'title' => 'Project Logistics Tracker',
+      'icon' => 'bx-briefcase',
+      'subs' => [
+        ['title' => 'Project Requirement Planning', 'link' => 'project_requirement_planning.php'],
+        ['title' => 'Procurement & Supplier Coordination', 'link' => 'procurement_supplier_coordination.php'],
+        ['title' => 'Shipment Scheduling & Route Planning', 'link' => 'shipment_scheduling_route_planning.php'],
+        ['title' => 'Execution & Real-Time Tracking', 'link' => 'execution_realtime_tracking.php'],
+        ['title' => 'Customs & Regulatory Compliance', 'link' => 'customs_regulatory_compliance.php'],
+        ['title' => 'Delivery & Site Coordination', 'link' => 'delivery_site_coordination.php'],
+        ['title' => 'Project Performance Monitoring & Closure', 'link' => 'project_performance_monitoring_closure.php'],
+      ]
     ],
       ['title'=>'Admin Settings','icon'=>'bx-cog','subs'=>[
           ['title'=>'Users & Roles','link'=>'usersRoles.php'],
-          ['title'=>'System Configuration','link'=>'systemConfiguration.php'],
+          // ['title'=>'System Configuration','link'=>'systemConfiguration.php'],
       ]],
     ];
 
@@ -270,11 +300,11 @@ window.addEventListener('click', e => {
 // Logout
 async function logoutUser() {
     try {
-        const res = await fetch('http://localhost/hr1-ecommerce/api/logout.php', { method: 'POST' });
+        const res = await fetch('http://localhost/caplog1/api/logout.php', { method: 'POST' });
         const data = await res.json();
         Toastify({ text: data.message || 'Logged out', duration: 3000 }).showToast();
         if (data.status === 'success') {
-            setTimeout(() => window.location.href = 'http://localhost/logistics1-ecommerce', 1000);
+            setTimeout(() => window.location.href = 'http://localhost/caplog1', 1000);
         }
     } catch (e) {
         console.error(e);

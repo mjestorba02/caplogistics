@@ -2,7 +2,7 @@
 session_start(); 
 
 if (!isset($_SESSION['id'])) {
-    header('Location:http://localhost/hr1-ecommerce');
+    header('Location:http://localhost/caplog1');
     exit();
 }
 
@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         const userId = <?php echo $userId; ?>;
-        const apiUrl = `http://localhost/logistics1-ecommerce/api/users.php?id=${userId}`;
+        const apiUrl = `http://localhost/caplog1/api/users.php?id=${userId}`;
 
         try {
             const response = await fetch(apiUrl, {

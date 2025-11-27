@@ -1,0 +1,85 @@
+╔════════════════════════════════════════════════════════════════════╗
+║             QUICK SETUP - MODULE 1 SUPPLIER IDENTIFICATION          ║
+╚════════════════════════════════════════════════════════════════════╝
+
+⚡ STEP 1: Open phpMyAdmin
+   → Go to http://localhost/phpmyadmin
+   → Login (username: root, password: leave blank)
+   → Select database: caplog1
+
+⚡ STEP 2: Create Table
+   → Click SQL tab
+   → Copy this code:
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ CREATE TABLE IF NOT EXISTS supplier_identification (               │
+│     id INT AUTO_INCREMENT PRIMARY KEY,                             │
+│     supplier_name VARCHAR(150) NOT NULL UNIQUE,                    │
+│     contact_email VARCHAR(150) NOT NULL,                           │
+│     certifications VARCHAR(500),                                   │
+│     risk_level ENUM('Low', 'Medium', 'High') DEFAULT 'Medium',    │
+│     phone VARCHAR(20),                                             │
+│     notes TEXT,                                                    │
+│     status ENUM('Active','Inactive','Archived') DEFAULT 'Active',  │
+│     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,                 │
+│     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP                 │
+│         ON UPDATE CURRENT_TIMESTAMP,                               │
+│     INDEX idx_risk_level (risk_level),                             │
+│     INDEX idx_status (status),                                     │
+│     INDEX idx_supplier_name (supplier_name),                       │
+│     INDEX idx_created_at (created_at)                              │
+│ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;                           │
+└─────────────────────────────────────────────────────────────────────┘
+
+   → Click GO
+
+⚡ STEP 3: Insert Sample Data
+   → In the SQL tab, paste this:
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ INSERT INTO supplier_identification                                │
+│   (supplier_name,contact_email,certifications,risk_level,          │
+│    phone,notes,status) VALUES                                      │
+│ ('ABC Manufacturing Corp','contact@abccorp.com',                   │
+│  'ISO 9001, ISO 14001','Low','+1-555-0101',                        │
+│  'Reliable supplier',  'Active'),                                  │
+│ ('XYZ Electronics Ltd','sales@xyzelectronics.com',                 │
+│  'ISO 9001, CE Mark, RoHS','Medium','+1-555-0102',                │
+│  'Good quality','Active'),                                         │
+│ ('Global Supplies Inc','info@globalsupplies.com',                  │
+│  'ISO 9001','Medium','+1-555-0103',                                │
+│  'Competitive pricing','Active');                                  │
+└─────────────────────────────────────────────────────────────────────┘
+
+   → Click GO
+
+⚡ STEP 4: Verify Setup
+   → Go to http://localhost/caplog1/pages/supplier_identification.php
+   → You should see 3 suppliers in the table
+   → Try clicking "Add Supplier" and create a new one
+
+✅ DONE! Module 1 is working!
+
+═════════════════════════════════════════════════════════════════════
+
+QUICK TEST:
+───────────
+1. Visit: http://localhost/caplog1/pages/supplier_identification.php
+2. Click: "Add Supplier" button
+3. Fill form with:
+   - Name: Test Company
+   - Email: test@company.com
+   - Risk Level: Low
+4. Click: Save Supplier
+5. ✅ Should see success toast and new row in table
+
+═════════════════════════════════════════════════════════════════════
+
+API ENDPOINTS (Now Working):
+────────────────────────────
+GET    /api/supplier_identification.php        → Get all suppliers
+POST   /api/supplier_identification.php        → Add new supplier
+PUT    /api/supplier_identification.php        → Update supplier
+DELETE /api/supplier_identification.php        → Delete supplier
+
+═════════════════════════════════════════════════════════════════════

@@ -2,7 +2,7 @@
 session_start(); 
 
 if (!isset($_SESSION['id'])) {
-    header('Location:http://localhost/hr1-ecommerce');
+    header('Location:http://localhost/caplog1');
     exit();
 }
 include '../layout/adminLayout.php';
@@ -79,7 +79,7 @@ $children = '
 <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 <script>
 // API URL
-const apiUrl = "http://localhost/logistics1-ecommerce/api/users.php";
+const apiUrl = "http://localhost/caplog1/api/users.php";
 const usersTableBody = document.getElementById("usersTableBody");
 const modal = document.getElementById("modal");
 const openModalBtn = document.getElementById("openModal");

@@ -1,0 +1,406 @@
+═════════════════════════════════════════════════════════════════════════════════
+                      SMART WAREHOUSING SYSTEM (SWS) 
+                            COMPLETE SETUP GUIDE
+═════════════════════════════════════════════════════════════════════════════════
+
+📦 WHAT'S NEW:
+
+A complete Smart Warehousing System with 4 integrated modules covering the entire
+warehouse operation lifecycle - from receiving goods to managing returns.
+
+═════════════════════════════════════════════════════════════════════════════════
+🎯 4 SUBMODULES CREATED:
+═════════════════════════════════════════════════════════════════════════════════
+
+1. INBOUND LOGISTICS (Receiving & Putaway)
+   Location: pages/inbound_logistics.php
+   Purpose: Track shipment arrivals, verify goods, check quality
+   Features:
+   ✓ Shipment tracking
+   ✓ Quality verification (Good/Damaged/Partial)
+   ✓ Handler identification with photo
+   ✓ Storage location assignment
+   ✓ Temperature/humidity monitoring
+   ✓ Barcode scanning count
+   Database: inbound_logistics table
+
+2. STORAGE & INVENTORY MANAGEMENT
+   Location: pages/storage_inventory.php
+   Purpose: Real-time inventory tracking and AI forecasting
+   Features:
+   ✓ SKU-based inventory tracking
+   ✓ Bin location management (ZONE-A, ZONE-B, etc.)
+   ✓ Movement frequency classification (Fast/Medium/Slow)
+   ✓ Stock level monitoring (Current/Reserved/Available)
+   ✓ AI forecasting (30-day & 90-day predictions)
+   ✓ Stockout risk assessment
+   ✓ Cycle counting automation
+   Database: storage_inventory table
+
+3. OUTBOUND LOGISTICS (Dispatch & Shipping)
+   Location: pages/outbound_logistics.php
+   Purpose: Manage order packing, loading, and dispatch
+   Features:
+   ✓ Shipment creation and tracking
+   ✓ Order-to-shipment mapping
+   ✓ Carrier management (Truck/Van/Motorcycle/Drone)
+   ✓ Route optimization tracking
+   ✓ GPS real-time tracking
+   ✓ Dispatch staff identification with photo
+   ✓ Customer tracking enablement
+   ✓ Multi-status workflow (Pending→Packed→Loaded→Dispatched→Delivered)
+   Database: outbound_logistics table
+
+4. RETURNS MANAGEMENT (Reverse Logistics)
+   Location: pages/returns_management.php
+   Purpose: Handle customer returns and disposal management
+   Features:
+   ✓ Return request initialization
+   ✓ Item inspection and classification (Resellable/Refurbish/Recycle/Dispose)
+   ✓ Condition assessment tracking
+   ✓ Inspector identification
+   ✓ Refund amount calculation
+   ✓ Restocking bin assignment
+   ✓ Disposal method tracking
+   ✓ Return status workflow
+   Database: returns_management table
+
+═════════════════════════════════════════════════════════════════════════════════
+📂 FILES CREATED:
+═════════════════════════════════════════════════════════════════════════════════
+
+API ENDPOINTS (Backend):
+  ✓ api/inbound_logistics.php         - CRUD operations for inbound shipments
+  ✓ api/storage_inventory.php         - CRUD operations for inventory items
+  ✓ api/outbound_logistics.php        - CRUD operations for outbound shipments
+  ✓ api/returns_management.php        - CRUD operations for returns
+
+FRONTEND PAGES (User Interface):
+  ✓ pages/inbound_logistics.php       - Inbound receiving interface
+  ✓ pages/storage_inventory.php       - Inventory dashboard
+  ✓ pages/outbound_logistics.php      - Shipping management interface
+  ✓ pages/returns_management.php      - Returns processing interface
+
+JAVASCRIPT MODULES (Frontend Logic):
+  ✓ scripts/inbound_logistics.js      - Inbound CRUD handlers & modals
+  ✓ scripts/storage_inventory.js      - Inventory CRUD handlers & modals
+  ✓ scripts/outbound_logistics.js     - Outbound CRUD handlers & modals
+  ✓ scripts/returns_management.js     - Returns CRUD handlers & modals
+
+DATABASE:
+  ✓ SWS_DATABASE_SCHEMA.sql          - Complete SQL with all 4 tables + sample data
+
+MENU:
+  ✓ Updated layout/adminLayout.php    - Added SWS navigation menu
+
+═════════════════════════════════════════════════════════════════════════════════
+🗄️ DATABASE TABLES CREATED:
+═════════════════════════════════════════════════════════════════════════════════
+
+TABLE 1: inbound_logistics
+┌─────────────────────────────────────────────────────────────┐
+│ Columns: 27                                                 │
+│ Primary Key: id (AUTO_INCREMENT)                            │
+│ Unique Constraints: shipment_id                             │
+│ Indexes: 5 (for fast queries)                               │
+│ Sample Rows: 3 pre-loaded                                   │
+│                                                             │
+│ Key Columns:                                                │
+│ • shipment_id (UNIQUE)                                      │
+│ • po_number, supplier_name                                  │
+│ • total_items, items_received, items_verified              │
+│ • quality_status (Pending/Good/Damaged/Partial)            │
+│ • storage_location, assigned_dock                          │
+│ • temperature_reading, humidity_reading                    │
+│ • handler_id, handler_name, handler_photo                  │
+│ • status (Pending/In Progress/Received/Verified/Complete)  │
+│ • created_at, updated_at (timestamps)                      │
+└─────────────────────────────────────────────────────────────┘
+
+TABLE 2: storage_inventory
+┌─────────────────────────────────────────────────────────────┐
+│ Columns: 32                                                 │
+│ Primary Key: id (AUTO_INCREMENT)                            │
+│ Unique Constraints: sku                                     │
+│ Indexes: 6 (for fast queries)                               │
+│ Sample Rows: 4 pre-loaded                                   │
+│                                                             │
+│ Key Columns:                                                │
+│ • sku (UNIQUE)                                              │
+│ • product_name, category                                   │
+│ • bin_location, warehouse_zone                             │
+│ • current_stock, reserved_stock, available_stock           │
+│ • min_stock, max_stock, reorder_point                      │
+│ • movement_frequency (Fast/Medium/Slow)                    │
+│ • last_counted, cycle_count_status                         │
+│ • stock_status (Optimal/Low/Overstock/Critical)            │
+│ • ai_forecast_30_days, ai_forecast_90_days                 │
+│ • stockout_risk (Low/Medium/High)                           │
+│ • supplier_id, supplier_name                               │
+│ • created_at, updated_at (timestamps)                      │
+└─────────────────────────────────────────────────────────────┘
+
+TABLE 3: outbound_logistics
+┌─────────────────────────────────────────────────────────────┐
+│ Columns: 31                                                 │
+│ Primary Key: id (AUTO_INCREMENT)                            │
+│ Unique Constraints: shipment_number                         │
+│ Indexes: 6 (for fast queries)                               │
+│ Sample Rows: 3 pre-loaded                                   │
+│                                                             │
+│ Key Columns:                                                │
+│ • shipment_number (UNIQUE)                                  │
+│ • order_id, customer_name, customer_email                  │
+│ • customer_phone, delivery_address                         │
+│ • total_items, items_packed, items_loaded                  │
+│ • total_weight_kg, carrier_name                            │
+│ • carrier_type (Truck/Van/Motorcycle/Drone)                │
+│ • estimated_delivery, actual_dispatch, actual_delivery     │
+│ • tracking_number, dispatch_staff_name                     │
+│ • gps_last_location, gps_last_update                       │
+│ • delivery_status (Pending/Packed/Loaded/Dispatched/etc.)  │
+│ • customer_tracking_enabled                                │
+│ • created_at, updated_at (timestamps)                      │
+└─────────────────────────────────────────────────────────────┘
+
+TABLE 4: returns_management
+┌─────────────────────────────────────────────────────────────┐
+│ Columns: 23                                                 │
+│ Primary Key: id (AUTO_INCREMENT)                            │
+│ Unique Constraints: return_id                               │
+│ Indexes: 6 (for fast queries)                               │
+│ Sample Rows: 3 pre-loaded                                   │
+│                                                             │
+│ Key Columns:                                                │
+│ • return_id (UNIQUE)                                        │
+│ • shipment_number, order_id                                │
+│ • customer_name, customer_email, reason_code               │
+│ • return_reason, item_count                                │
+│ • original_purchase_price, refund_amount                   │
+│ • item_classification (Resellable/Refurbish/Recycle/etc.)  │
+│ • inspection_status (Pending/In Progress/Complete)         │
+│ • return_status (Initiated/Received/Inspected/etc.)        │
+│ • inspector_id, inspector_name, inspector_notes            │
+│ • approval_status (Pending/Approved/Rejected)              │
+│ • created_at, updated_at (timestamps)                      │
+└─────────────────────────────────────────────────────────────┘
+
+═════════════════════════════════════════════════════════════════════════════════
+🚀 QUICK START - 3 STEPS:
+═════════════════════════════════════════════════════════════════════════════════
+
+STEP 1: Create Database Tables
+────────────────────────────────
+1. Open phpMyAdmin
+   → http://localhost/phpmyadmin
+
+2. Select your database: logcap1
+
+3. Click SQL tab
+
+4. Copy all content from: SWS_DATABASE_SCHEMA.sql
+
+5. Paste into SQL editor
+
+6. Click GO
+
+7. Wait for "No errors" message
+
+✓ All 4 tables will be created with sample data!
+
+
+STEP 2: Verify Files in VS Code
+───────────────────────────────
+Check these directories in your workspace:
+
+api/
+  ✓ inbound_logistics.php
+  ✓ storage_inventory.php
+  ✓ outbound_logistics.php
+  ✓ returns_management.php
+
+pages/
+  ✓ inbound_logistics.php
+  ✓ storage_inventory.php
+  ✓ outbound_logistics.php
+  ✓ returns_management.php
+
+scripts/
+  ✓ inbound_logistics.js
+  ✓ storage_inventory.js
+  ✓ outbound_logistics.js
+  ✓ returns_management.js
+
+layout/
+  ✓ adminLayout.php (updated with SWS menu)
+
+
+STEP 3: Test the Modules
+────────────────────────
+1. Open http://localhost/caplog1 and log in
+
+2. Click on "Smart Warehousing" in the left sidebar
+
+3. You should see 4 submodules:
+   • Inbound Logistics (Receiving & Putaway)
+   • Storage & Inventory Management
+   • Outbound Logistics (Dispatch & Shipping)
+   • Returns Management (Reverse Logistics)
+
+4. Click each module and verify:
+   ✓ Tables display with sample data
+   ✓ "Add" button opens modal
+   ✓ Edit/Delete buttons work
+   ✓ Form submission shows success toast
+
+═════════════════════════════════════════════════════════════════════════════════
+🔗 API ENDPOINTS REFERENCE:
+═════════════════════════════════════════════════════════════════════════════════
+
+All APIs follow the same pattern:
+
+GET Request (Fetch all records):
+  Method: GET
+  URL: /api/[module_name].php
+  Optional: ?search=query
+  Response: { "status": "success", "records": [...] }
+
+POST Request (Create new record):
+  Method: POST
+  Body: JSON object with fields
+  Response: { "status": "success", "message": "Record created" }
+
+PUT Request (Update existing record):
+  Method: PUT
+  Body: JSON with id + all fields to update
+  Response: { "status": "success", "message": "Record updated" }
+
+DELETE Request (Delete record):
+  Method: DELETE
+  Body: { "id": 123 }
+  Response: { "status": "success", "message": "Record deleted" }
+
+Example API URLs:
+  • /api/inbound_logistics.php
+  • /api/storage_inventory.php
+  • /api/outbound_logistics.php
+  • /api/returns_management.php
+
+═════════════════════════════════════════════════════════════════════════════════
+✨ KEY FEATURES:
+═════════════════════════════════════════════════════════════════════════════════
+
+✓ REAL-TIME TRACKING
+  Track every item from warehouse entry to final delivery or return
+
+✓ AI FORECASTING
+  Predict stock levels 30 and 90 days ahead to prevent stockouts
+
+✓ MULTI-STATUS WORKFLOWS
+  Track items through multiple status stages (Pending → Completed)
+
+✓ GPS TRACKING
+  Real-time location updates for dispatch shipments
+
+✓ QUALITY ASSURANCE
+  Automatic classification of returned items (Resellable/Refurbish/Dispose)
+
+✓ HANDLER IDENTIFICATION
+  Capture photo/ID of person handling each shipment
+
+✓ SEARCH & FILTER
+  Instantly find shipments by ID, customer, or supplier
+
+✓ RESPONSIVE DESIGN
+  Works on desktop, tablet, and mobile devices
+
+✓ AUTOMATED TOASTS
+  Success/error notifications for all operations
+
+✓ SAMPLE DATA INCLUDED
+  3 sample records in each table for testing
+
+═════════════════════════════════════════════════════════════════════════════════
+📊 WORKFLOW EXAMPLES:
+═════════════════════════════════════════════════════════════════════════════════
+
+EXAMPLE 1: INBOUND SHIPMENT WORKFLOW
+─────────────────────────────────────
+1. Supplier ships goods → Shipment created in Inbound Logistics
+2. Goods arrive at dock → Status = "Received"
+3. Quality check performed → Status = "Verified", Quality = "Good"
+4. Items stored → Storage Location assigned, Status = "Putaway Complete"
+5. Items added to Storage Inventory with current stock
+
+EXAMPLE 2: OUTBOUND ORDER WORKFLOW
+──────────────────────────────────
+1. Customer order created → Shipment created in Outbound Logistics
+2. Items picked from inventory → Status = "Packed"
+3. Items loaded on carrier → Status = "Loaded"
+4. Shipment dispatched → Status = "Dispatched", Tracking # assigned
+5. Real-time tracking → GPS location updates
+6. Delivered to customer → Status = "Delivered"
+
+EXAMPLE 3: RETURN HANDLING WORKFLOW
+───────────────────────────────────
+1. Customer initiates return → Return created with reason
+2. Goods received back → Status = "Received"
+3. Items inspected → Inspector assesses condition, Status = "Inspected"
+4. Classification made → Resellable/Refurbish/Dispose
+5. Action taken:
+   • Resellable → Restocked to inventory
+   • Refurbish → Sent to repair facility
+   • Dispose → Assigned disposal method
+
+═════════════════════════════════════════════════════════════════════════════════
+🆘 TROUBLESHOOTING:
+═════════════════════════════════════════════════════════════════════════════════
+
+Q: Modules show "No items found" even though I added data?
+A: Clear your browser cache (Ctrl+F5) and refresh the page
+
+Q: Error "Unauthorized" when trying to save?
+A: Make sure you're logged in and your session is active
+
+Q: Modal doesn't open?
+A: Check browser console (F12) for JavaScript errors
+
+Q: API returns 500 error?
+A: Check that the database table exists and has correct column names
+
+Q: Search not working?
+A: Ensure the search term matches exactly or is a substring
+
+═════════════════════════════════════════════════════════════════════════════════
+📝 CUSTOMIZATION:
+═════════════════════════════════════════════════════════════════════════════════
+
+To customize status values, modify these files:
+
+Inbound Logistics Statuses:
+→ pages/inbound_logistics.php (line with quality_status select)
+→ api/inbound_logistics.php (UPDATE statement)
+
+Storage Inventory Frequencies:
+→ pages/storage_inventory.php (movement_frequency select)
+
+Outbound Logistics Statuses:
+→ pages/outbound_logistics.php (delivery_status select)
+
+Returns Classifications:
+→ pages/returns_management.php (item_classification select)
+
+═════════════════════════════════════════════════════════════════════════════════
+✅ NEXT STEPS:
+═════════════════════════════════════════════════════════════════════════════════
+
+1. Execute the SQL script to create tables
+2. Test each module with sample data
+3. Try adding your own records
+4. Verify cross-module workflows work
+5. Customize statuses/classifications as needed
+6. Train users on the new system
+
+═════════════════════════════════════════════════════════════════════════════════
+                             SETUP COMPLETE! 🎉
+═════════════════════════════════════════════════════════════════════════════════

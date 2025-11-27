@@ -1,0 +1,99 @@
+═══════════════════════════════════════════════════════════════════════════════
+                        DATABASE SCHEMA REFERENCE
+                    Table: supplier_identification
+═══════════════════════════════════════════════════════════════════════════════
+
+COLUMN DEFINITION:
+───────────────────────────────────────────────────────────────────────────────
+
+┌─────────────────┬──────────────┬──────────┬──────────────────────────────────┐
+│ Column Name     │ Data Type    │ Required │ Description                      │
+├─────────────────┼──────────────┼──────────┼──────────────────────────────────┤
+│ id              │ INT          │ ✓ PK*    │ Auto-increment primary key       │
+│ supplier_name   │ VARCHAR(150) │ ✓        │ Unique supplier company name     │
+│ contact_email   │ VARCHAR(150) │ ✓        │ Supplier contact email           │
+│ certifications  │ VARCHAR(500) │ ✗        │ Comma-separated certifications   │
+│ risk_level      │ ENUM         │ ✓        │ Low / Medium / High              │
+│ phone           │ VARCHAR(20)  │ ✗        │ Contact phone number             │
+│ notes           │ TEXT         │ ✗        │ Additional notes/comments        │
+│ status          │ ENUM         │ ✓        │ Active/Inactive/Archived         │
+│ created_at      │ DATETIME     │ ✓ AUTO   │ Timestamp when created           │
+│ updated_at      │ DATETIME     │ ✓ AUTO   │ Timestamp when last updated      │
+└─────────────────┴──────────────┴──────────┴──────────────────────────────────┘
+
+* PK = Primary Key
+✓ = Required    ✗ = Optional
+
+═══════════════════════════════════════════════════════════════════════════════
+
+INDEXES (For Performance):
+───────────────────────────────────────────────────────────────────────────────
+
+idx_risk_level        → Speeds up filtering by risk level
+idx_status            → Speeds up filtering by status
+idx_supplier_name     → Speeds up searching by supplier name
+idx_created_at        → Speeds up sorting by date
+
+═══════════════════════════════════════════════════════════════════════════════
+
+SAMPLE DATA:
+───────────────────────────────────────────────────────────────────────────────
+
+ID  Supplier Name          Email                      Certifications             Risk  Status
+──  ────────────────────    ──────────────────────    ──────────────────────    ────  ──────
+1   ABC Manufacturing      contact@abccorp.com        ISO 9001, ISO 14001        Low   Active
+2   XYZ Electronics Ltd    sales@xyzelectronics.com   ISO 9001, CE Mark, RoHS    Med   Active
+3   Global Supplies Inc    info@globalsupplies.com    ISO 9001                   Med   Active
+
+═══════════════════════════════════════════════════════════════════════════════
+
+ENUM VALUES:
+───────────────────────────────────────────────────────────────────────────────
+
+risk_level:
+  - Low      → Low risk supplier
+  - Medium   → Medium risk supplier
+  - High     → High risk supplier
+
+status:
+  - Active   → Currently active
+  - Inactive → Temporarily inactive
+  - Archived → Archived (no longer used)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+API OPERATIONS SUPPORTED:
+───────────────────────────────────────────────────────────────────────────────
+
+CREATE (POST):
+  INSERT INTO supplier_identification
+  (supplier_name, contact_email, certifications, risk_level, phone, notes)
+  VALUES (?, ?, ?, ?, ?, ?)
+
+READ (GET):
+  SELECT * FROM supplier_identification
+  ORDER BY created_at DESC
+
+UPDATE (PUT):
+  UPDATE supplier_identification
+  SET supplier_name=?, contact_email=?, certifications=?, risk_level=?,
+      phone=?, notes=?
+  WHERE id=?
+
+DELETE:
+  DELETE FROM supplier_identification
+  WHERE id=?
+
+═══════════════════════════════════════════════════════════════════════════════
+
+CONSTRAINTS:
+───────────────────────────────────────────────────────────────────────────────
+
+✓ supplier_name is UNIQUE - No duplicate supplier names allowed
+✓ id is PRIMARY KEY - Automatically incremented
+✓ created_at is auto-timestamped on INSERT
+✓ updated_at is auto-timestamped on UPDATE
+✓ Charset: utf8mb4 (supports emojis and special characters)
+✓ Collation: utf8mb4_general_ci (case-insensitive)
+
+═══════════════════════════════════════════════════════════════════════════════

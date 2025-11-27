@@ -3,7 +3,7 @@
 session_start(); 
 
 if (!isset($_SESSION['id'])) {
-    header('Location:http://localhost/hr1-ecommerce');
+    header('Location:http://localhost/caplog1');
     exit();
 }
 include '../layout/adminLayout.php';

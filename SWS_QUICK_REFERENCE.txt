@@ -1,0 +1,249 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                ║
+║                SMART WAREHOUSING SYSTEM - QUICK REFERENCE CARD                 ║
+║                                                                                ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+🚀 QUICK START IN 3 STEPS
+═════════════════════════════════════════════════════════════════════════════════
+
+STEP 1: IMPORT DATABASE
+───────────────────────
+1. Open phpMyAdmin → http://localhost/phpmyadmin
+2. Select: logcap1
+3. Click: SQL tab
+4. Copy from: SWS_DATABASE_SCHEMA.sql
+5. Paste & Click: GO
+✓ Done! All tables created
+
+STEP 2: VERIFY FILES
+────────────────────
+Check these exist:
+  api/           → 4 new PHP files
+  pages/         → 4 new PHP files
+  scripts/       → 4 new JS files
+  layout/        → adminLayout.php (updated)
+✓ All files present
+
+STEP 3: TEST
+────────────
+1. Visit: http://localhost/caplog1
+2. Login with credentials
+3. Sidebar → Smart Warehousing
+4. Click each module
+5. Verify sample data loads
+✓ Ready to use!
+
+═════════════════════════════════════════════════════════════════════════════════
+📦 4 MODULES
+═════════════════════════════════════════════════════════════════════════════════
+
+1️⃣  INBOUND LOGISTICS
+    Purpose: Receive & verify goods from suppliers
+    URL: pages/inbound_logistics.php
+    Key Fields: shipment_id, supplier, quality, handler
+    Status Flow: Pending → Verified → Putaway Complete
+
+2️⃣  STORAGE & INVENTORY
+    Purpose: Track inventory with AI forecasting
+    URL: pages/storage_inventory.php
+    Key Fields: SKU, product, bin_location, current_stock
+    Features: Stockout alerts, Movement frequency, Forecasts
+
+3️⃣  OUTBOUND LOGISTICS
+    Purpose: Manage order dispatch & tracking
+    URL: pages/outbound_logistics.php
+    Key Fields: shipment_number, customer, tracking, carrier
+    Status Flow: Packed → Loaded → Dispatched → Delivered
+
+4️⃣  RETURNS MANAGEMENT
+    Purpose: Handle customer returns & disposal
+    URL: pages/returns_management.php
+    Key Fields: return_id, reason, classification, inspector
+    Status Flow: Initiated → Inspected → Refunded/Disposed
+
+═════════════════════════════════════════════════════════════════════════════════
+🔗 API ENDPOINTS
+═════════════════════════════════════════════════════════════════════════════════
+
+GET    /api/inbound_logistics.php              → List all
+POST   /api/inbound_logistics.php              → Create
+PUT    /api/inbound_logistics.php              → Update
+DELETE /api/inbound_logistics.php              → Delete
+
+GET    /api/storage_inventory.php              → List all
+POST   /api/storage_inventory.php              → Create
+PUT    /api/storage_inventory.php              → Update
+DELETE /api/storage_inventory.php              → Delete
+
+GET    /api/outbound_logistics.php             → List all
+POST   /api/outbound_logistics.php             → Create
+PUT    /api/outbound_logistics.php             → Update
+DELETE /api/outbound_logistics.php             → Delete
+
+GET    /api/returns_management.php             → List all
+POST   /api/returns_management.php             → Create
+PUT    /api/returns_management.php             → Update
+DELETE /api/returns_management.php             → Delete
+
+═════════════════════════════════════════════════════════════════════════════════
+📊 DATABASE TABLES
+═════════════════════════════════════════════════════════════════════════════════
+
+inbound_logistics (27 cols)         storage_inventory (32 cols)
+├─ id (PK)                          ├─ id (PK)
+├─ shipment_id (UNIQUE)             ├─ sku (UNIQUE)
+├─ po_number                        ├─ product_name
+├─ supplier_name                    ├─ bin_location
+├─ total_items                      ├─ current_stock
+├─ items_received                   ├─ available_stock
+├─ quality_status                   ├─ movement_frequency
+├─ storage_location                 ├─ ai_forecast_30_days
+├─ handler_name                     ├─ stockout_risk
+├─ status                           ├─ supplier_name
+└─ timestamps                       └─ timestamps
+
+outbound_logistics (31 cols)        returns_management (23 cols)
+├─ id (PK)                          ├─ id (PK)
+├─ shipment_number (UNIQUE)         ├─ return_id (UNIQUE)
+├─ order_id                         ├─ order_id
+├─ customer_name                    ├─ customer_name
+├─ delivery_address                 ├─ return_reason
+├─ total_items                      ├─ item_classification
+├─ carrier_name                     ├─ inspection_status
+├─ tracking_number                  ├─ return_status
+├─ delivery_status                  ├─ inspector_name
+├─ dispatch_staff_name              ├─ refund_amount
+└─ timestamps                       └─ timestamps
+
+═════════════════════════════════════════════════════════════════════════════════
+✨ FEATURES
+═════════════════════════════════════════════════════════════════════════════════
+
+✓ Real-time data sync without page reload
+✓ Advanced search & filter on all modules
+✓ CRUD operations (Create, Read, Update, Delete)
+✓ Modal forms with validation
+✓ Toast notifications (success/error)
+✓ Multi-status workflows
+✓ Mobile responsive design
+✓ 13 sample records pre-loaded
+✓ PDO prepared statements (SQL injection safe)
+✓ Complete error handling
+
+═════════════════════════════════════════════════════════════════════════════════
+🆘 COMMON ISSUES
+═════════════════════════════════════════════════════════════════════════════════
+
+Issue: "No records found"
+Fix: Clear cache (Ctrl+F5), refresh page
+
+Issue: Modal won't open
+Fix: Check browser console (F12), ensure JS files loaded
+
+Issue: API error
+Fix: Verify tables exist in phpMyAdmin
+
+Issue: Search not working
+Fix: Type exact match or substring, not partial words
+
+Issue: Toast not showing
+Fix: Check Toastify library is loaded in browser
+
+═════════════════════════════════════════════════════════════════════════════════
+📁 FILE LOCATIONS
+═════════════════════════════════════════════════════════════════════════════════
+
+All in: C:\xampp\htdocs\caplog1\
+
+📋 SQL              → SWS_DATABASE_SCHEMA.sql
+📖 Guide            → SWS_SETUP_GUIDE.txt
+📝 Summary          → SWS_COMPLETE_SUMMARY.txt
+📋 Checklist        → SWS_FILE_CHECKLIST.txt
+🔌 APIs             → api/[module].php (4 files)
+🖥️  Pages            → pages/[module].php (4 files)
+⚙️  Scripts          → scripts/[module].js (4 files)
+
+═════════════════════════════════════════════════════════════════════════════════
+🎯 COMMON WORKFLOWS
+═════════════════════════════════════════════════════════════════════════════════
+
+WORKFLOW 1: Supplier Shipment
+  1. Create in Inbound Logistics
+  2. Mark as "Received"
+  3. Check quality
+  4. Assign storage location
+  5. Add items to Storage Inventory
+
+WORKFLOW 2: Customer Order
+  1. Create in Outbound Logistics
+  2. Pack items (update status)
+  3. Load to carrier
+  4. Generate tracking number
+  5. Dispatch and track
+
+WORKFLOW 3: Return Processing
+  1. Create in Returns Management
+  2. Inspect received items
+  3. Classify (Resellable/Refurbish/Dispose)
+  4. Process accordingly
+  5. Mark as Refunded/Disposed
+
+═════════════════════════════════════════════════════════════════════════════════
+⌨️ KEYBOARD SHORTCUTS
+═════════════════════════════════════════════════════════════════════════════════
+
+Ctrl+F5        Clear browser cache & refresh
+F12            Open browser developer console
+Enter          Submit form in modal
+Esc            Close modal
+Tab            Navigate form fields
+
+═════════════════════════════════════════════════════════════════════════════════
+🔐 SECURITY NOTES
+═════════════════════════════════════════════════════════════════════════════════
+
+✓ All APIs require session authentication
+✓ Prepared statements prevent SQL injection
+✓ Input validation on all forms
+✓ Error messages don't expose database details
+✓ PDO error mode set to exceptions
+✓ Content-Type forced to JSON
+
+═════════════════════════════════════════════════════════════════════════════════
+💡 TIPS & TRICKS
+═════════════════════════════════════════════════════════════════════════════════
+
+• Use search to find records quickly
+• Edit to modify any field after creation
+• Delete with confirmation to prevent accidents
+• Status workflow shows item progression
+• Classification helps track item disposition
+• Forecasts predict stock issues
+• Tracking enables customer visibility
+
+═════════════════════════════════════════════════════════════════════════════════
+📞 SUPPORT
+═════════════════════════════════════════════════════════════════════════════════
+
+Read SWS_SETUP_GUIDE.txt for:
+  • Detailed setup instructions
+  • Module explanations
+  • Workflow examples
+  • Troubleshooting
+
+Read SWS_COMPLETE_SUMMARY.txt for:
+  • System overview
+  • File descriptions
+  • Database details
+  • Next steps
+
+═════════════════════════════════════════════════════════════════════════════════
+✅ READY TO GO!
+═════════════════════════════════════════════════════════════════════════════════
+
+Everything is set up and ready to use!
+
+Next: Execute the SQL in phpMyAdmin, then test each module.
+
+═════════════════════════════════════════════════════════════════════════════════

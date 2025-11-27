@@ -1,6 +1,11 @@
 <?php
+// $host = "localhost";
+// $db_name = "log1_logisticss1_ecommerce";
+// $username = "log1_logistics1_admin"; // change if needed
+// $password = "ZVz@o@KMRZ^0NFve";     // change if needed
+
 $host = "localhost";
-$db_name = "logistics1-ecommerce";
+$db_name = "logcap1";
 $username = "root"; // change if needed
 $password = "";     // change if needed
 
