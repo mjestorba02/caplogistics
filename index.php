@@ -129,7 +129,7 @@
     loginSpinner.classList.remove('hidden');
 
     try {
-      const response = await fetch('https://log1.imarketph.com/api/auth.php', {
+      const response = await fetch('http://localhost/caplog1/api/auth.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })

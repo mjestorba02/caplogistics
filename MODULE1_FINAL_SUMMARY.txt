@@ -87,7 +87,7 @@ STEP 1: EXECUTE SQL IN phpMyAdmin
    [Copy from file and paste - takes 2 minutes]
 
 STEP 2: VERIFY IN BROWSER
-   ➜ Go to: https://log1.imarketph.com/pages/supplier_identification.php
+   ➜ Go to: http://localhost/caplog1/pages/supplier_identification.php
    ➜ Should see: 3 suppliers in table from sample data
 
 STEP 3: TEST THE FEATURE
@@ -121,23 +121,23 @@ INDEXES:
 API ENDPOINTS (NOW WORKING)
 ═════════════════════════════════════════════════════════════════════════════════
 
-GET https://log1.imarketph.com/api/supplier_identification.php
+GET http://localhost/caplog1/api/supplier_identification.php
     Returns all suppliers from database
     Response: { status: "success", suppliers: [...] }
 
-POST https://log1.imarketph.com/api/supplier_identification.php
+POST http://localhost/caplog1/api/supplier_identification.php
     Creates new supplier in database
     Payload: { supplier_name, contact_email, certifications[], risk_level, 
                phone, notes }
     Response: { status: "success", message: "..." }
 
-PUT https://log1.imarketph.com/api/supplier_identification.php
+PUT http://localhost/caplog1/api/supplier_identification.php
     Updates existing supplier in database
     Payload: { id, supplier_name, contact_email, certifications[], risk_level, 
                phone, notes }
     Response: { status: "success", message: "..." }
 
-DELETE https://log1.imarketph.com/api/supplier_identification.php
+DELETE http://localhost/caplog1/api/supplier_identification.php
     Deletes supplier from database
     Payload: { id }
     Response: { status: "success", message: "..." }
@@ -224,7 +224,7 @@ NEXT STEPS
 
 IMMEDIATE (NOW):
   1. Execute supplier_identification_table.sql in phpMyAdmin
-  2. Test on https://log1.imarketph.com/pages/supplier_identification.php
+  2. Test on http://localhost/caplog1/pages/supplier_identification.php
   3. Verify all CRUD operations work
 
 OPTIONAL:

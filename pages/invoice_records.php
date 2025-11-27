@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['id'])) { header('Location: https://log1.imarketph.com'); exit(); }
+if (!isset($_SESSION['id'])) { header('Location: http://localhost/caplog1'); exit(); }
 include '../layout/adminLayout.php';
 
 $children = <<<'HTML'
@@ -71,7 +71,7 @@ $children = <<<'HTML'
 </div>
 
 <script>
-const API = 'https://log1.imarketph.com/api/invoices.php';
+const API = 'http://localhost/caplog1/api/invoices.php';
 async function fetchInvoices(q=''){
   const url = new URL(API, location.origin);
   const resp = await fetch(url.toString(), { credentials: 'same-origin' });
@@ -129,7 +129,7 @@ async function loadAndRender(){
     const companyAddress = '123 Warehouse Ave, City, Country';
     const companyPhone = '+1 (555) 123-4567';
     const companyEmail = 'info@logistics1.com';
-    const logoUrl = 'https://log1.imarketph.com/images/logo.jpg'; // adjust path as needed
+    const logoUrl = 'http://localhost/caplog1/images/logo.jpg'; // adjust path as needed
     const invoiceNumber = inv.invoice_number || ('#' + (inv.id || ''));
     const date = inv.date || (inv.created_at ? inv.created_at.split(' ')[0] : '');
     const due = inv.due_date || '';

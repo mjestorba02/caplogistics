@@ -109,71 +109,75 @@ function adminLayout($children) {
     ]
   ],
   [
-    'title' => 'Records & Compliance',
-    'icon' => 'bx-folder',
-    'subs' => [
-      ['title' => 'Document Management', 'link' => 'documents.php'],
-      // ['title' => 'Audit & Reporting', 'link' => 'audit_reporting.php'],
-      // ['title' => 'Archives & Search', 'link' => 'archives.php'],
-    ]
-    ],
-    [
-      'title' => 'Project Logistics Tracker',
-      'icon' => 'bx-briefcase',
+      'title' => 'Document Tracking & Logistics Records',
+      'icon' => 'bx-folder',
       'subs' => [
-        ['title' => 'Project Requirement Planning', 'link' => 'project_requirement_planning.php'],
-        ['title' => 'Procurement & Supplier Coordination', 'link' => 'procurement_supplier_coordination.php'],
-        ['title' => 'Shipment Scheduling & Route Planning', 'link' => 'shipment_scheduling_route_planning.php'],
-        ['title' => 'Execution & Real-Time Tracking', 'link' => 'execution_realtime_tracking.php'],
-        ['title' => 'Customs & Regulatory Compliance', 'link' => 'customs_regulatory_compliance.php'],
-        ['title' => 'Delivery & Site Coordination', 'link' => 'delivery_site_coordination.php'],
-        ['title' => 'Project Performance Monitoring & Closure', 'link' => 'project_performance_monitoring_closure.php'],
+          ['title' => 'Document Creation & Capture', 'link' => 'document_creation_capture.php'],
+          ['title' => 'Document Verification & Validation', 'link' => 'document_verification_validation.php'],
+          ['title' => 'Secure Storage & Organization', 'link' => 'secure_storage_organization.php'],
+          ['title' => 'Document Tracking & Visibility', 'link' => 'document_tracking_visibility.php'],
+          ['title' => 'Integration with Logistics Operations', 'link' => 'integration_logistics_operations.php'],
+          ['title' => 'Retention & Compliance Management', 'link' => 'retention_compliance_management.php'],
+          ['title' => 'Analytics & Reporting', 'link' => 'analytics_reporting.php'],
       ]
-    ],
-      ['title'=>'Admin Settings','icon'=>'bx-cog','subs'=>[
-          ['title'=>'Users & Roles','link'=>'usersRoles.php'],
-          // ['title'=>'System Configuration','link'=>'systemConfiguration.php'],
-      ]],
-    ];
+  ],
+  [
+    'title' => 'Project Logistics Tracker',
+    'icon' => 'bx-briefcase',
+    'subs' => [
+      ['title' => 'Project Requirement Planning', 'link' => 'project_requirement_planning.php'],
+      ['title' => 'Procurement & Supplier Coordination', 'link' => 'procurement_supplier_coordination.php'],
+      ['title' => 'Shipment Scheduling & Route Planning', 'link' => 'shipment_scheduling_route_planning.php'],
+      ['title' => 'Execution & Real-Time Tracking', 'link' => 'execution_realtime_tracking.php'],
+      ['title' => 'Customs & Regulatory Compliance', 'link' => 'customs_regulatory_compliance.php'],
+      ['title' => 'Delivery & Site Coordination', 'link' => 'delivery_site_coordination.php'],
+      ['title' => 'Project Performance Monitoring & Closure', 'link' => 'project_performance_monitoring_closure.php'],
+    ]
+  ],
+    ['title'=>'Admin Settings','icon'=>'bx-cog','subs'=>[
+        ['title'=>'Users & Roles','link'=>'usersRoles.php'],
+        // ['title'=>'System Configuration','link'=>'systemConfiguration.php'],
+    ]],
+  ];
 
-    foreach($modules as $mod):
-      // Check if 'link' key exists to avoid the "Undefined array key" warning
-      $isCurrentPage = isset($mod['link']) && ($currentPage == $mod['link']);
-      $hasActiveSub = false;
-      if (!empty($mod['subs'])) {
-          foreach ($mod['subs'] as $sub) {
-              if ($currentPage == $sub['link']) {
-                  $hasActiveSub = true;
-                  break;
-              }
-          }
-      }
-    ?>
-      <?php if(empty($mod['subs'])): ?>
-        <li>
-          <a href="<?= $mod['link'] ?>" class="flex items-center gap-6 p-3 rounded-lg text-lg font-medium text-white hover:bg-[#4353a2] <?= $isCurrentPage ? 'bg-[#5c6cb8] mb-2' : '' ?>">
-            <i class='bx <?= $mod['icon'] ?> text-2xl text-white'></i>
-            <span class="links_name md:inline text-[16px]"><?= $mod['title'] ?></span>
-          </a>
-        </li>
-      <?php else: ?>
-        <li class="has-dropdown <?= $hasActiveSub ? 'active' : '' ?>">
-          <button class="flex items-center gap-4 w-full p-3 rounded-lg text-lg font-medium text-white hover:bg-[#4353a2] <?= $hasActiveSub ? 'bg-[#5c6cb8] mb-2' : '' ?>">
-            <i class='bx <?= $mod['icon'] ?> text-2xl text-white'></i>
-            <span class="links_name md:inline text-[16px]"><?= $mod['title'] ?></span>
-            <i class='bx bx-chevron-down ml-auto text-xl transition-transform transform <?= $hasActiveSub ? 'rotate-180' : '' ?>'></i>
-          </button>
-          <div class="dropdown flex-col pl-12 space-y-2 mt-2">
-            <?php foreach($mod['subs'] as $sub): ?>
-              <a href="<?= $sub['link'] ?>" class="flex items-center gap-3 p-2 rounded-lg text-gray-200 hover:bg-[#4353a2] <?php if($currentPage==$sub['link']) echo 'bg-[#5c6cb8]'; ?>">
-                <i class='bx bx-right-arrow-alt text-[12px]'></i><?= $sub['title'] ?>
-              </a>
-            <?php endforeach; ?>
-          </div>
-        </li>
-      <?php endif; ?>
-    <?php endforeach; ?>
-  </ul>
+  foreach($modules as $mod):
+    // Check if 'link' key exists to avoid the "Undefined array key" warning
+    $isCurrentPage = isset($mod['link']) && ($currentPage == $mod['link']);
+    $hasActiveSub = false;
+    if (!empty($mod['subs'])) {
+        foreach ($mod['subs'] as $sub) {
+            if ($currentPage == $sub['link']) {
+                $hasActiveSub = true;
+                break;
+            }
+        }
+    }
+  ?>
+    <?php if(empty($mod['subs'])): ?>
+      <li>
+        <a href="<?= $mod['link'] ?>" class="flex items-center gap-6 p-3 rounded-lg text-lg font-medium text-white hover:bg-[#4353a2] <?= $isCurrentPage ? 'bg-[#5c6cb8] mb-2' : '' ?>">
+          <i class='bx <?= $mod['icon'] ?> text-2xl text-white'></i>
+          <span class="links_name md:inline text-[16px]"><?= $mod['title'] ?></span>
+        </a>
+      </li>
+    <?php else: ?>
+      <li class="has-dropdown <?= $hasActiveSub ? 'active' : '' ?>">
+        <button class="flex items-center gap-4 w-full p-3 rounded-lg text-lg font-medium text-white hover:bg-[#4353a2] <?= $hasActiveSub ? 'bg-[#5c6cb8] mb-2' : '' ?>">
+          <i class='bx <?= $mod['icon'] ?> text-2xl text-white'></i>
+          <span class="links_name md:inline text-[16px]"><?= $mod['title'] ?></span>
+          <i class='bx bx-chevron-down ml-auto text-xl transition-transform transform <?= $hasActiveSub ? 'rotate-180' : '' ?>'></i>
+        </button>
+        <div class="dropdown flex-col pl-12 space-y-2 mt-2">
+          <?php foreach($mod['subs'] as $sub): ?>
+            <a href="<?= $sub['link'] ?>" class="flex items-center gap-3 p-2 rounded-lg text-gray-200 hover:bg-[#4353a2] <?php if($currentPage==$sub['link']) echo 'bg-[#5c6cb8]'; ?>">
+              <i class='bx bx-right-arrow-alt text-[12px]'></i><?= $sub['title'] ?>
+            </a>
+          <?php endforeach; ?>
+        </div>
+      </li>
+    <?php endif; ?>
+  <?php endforeach; ?>
+</ul>
 
 <div class="p-4 border-t border-gray-200 flex items-center gap-2">
     <!-- Initials Circle with link -->
@@ -300,11 +304,11 @@ window.addEventListener('click', e => {
 // Logout
 async function logoutUser() {
     try {
-        const res = await fetch('https://log1.imarketph.com/api/logout.php', { method: 'POST' });
+        const res = await fetch('http://localhost/caplog1/api/logout.php', { method: 'POST' });
         const data = await res.json();
         Toastify({ text: data.message || 'Logged out', duration: 3000 }).showToast();
         if (data.status === 'success') {
-            setTimeout(() => window.location.href = 'https://log1.imarketph.com', 1000);
+            setTimeout(() => window.location.href = 'http://localhost/caplog1', 1000);
         }
     } catch (e) {
         console.error(e);

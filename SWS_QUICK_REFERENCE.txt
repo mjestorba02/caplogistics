@@ -27,7 +27,7 @@ Check these exist:
 
 STEP 3: TEST
 ────────────
-1. Visit: https://log1.imarketph.com
+1. Visit: http://localhost/caplog1
 2. Login with credentials
 3. Sidebar → Smart Warehousing
 4. Click each module

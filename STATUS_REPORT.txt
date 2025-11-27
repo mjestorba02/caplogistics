@@ -100,7 +100,7 @@ OPTION 2: Detailed Setup (10 minutes)
 
 OPTION 3: Auto-Setup (If phpMyAdmin unavailable)
 ────────────────────
-1. Visit: https://log1.imarketph.com/setup_supplier_table.php
+1. Visit: http://localhost/caplog1/setup_supplier_table.php
 2. Script creates table automatically
 3. Done!
 
@@ -116,7 +116,7 @@ After setup, verify by:
      → Should contain: 3 records
 
 ☐ 2. Check Module 1 page
-     → https://log1.imarketph.com/pages/supplier_identification.php
+     → http://localhost/caplog1/pages/supplier_identification.php
      → Should see: Table with 3 suppliers
 
 ☐ 3. Test Add Supplier
