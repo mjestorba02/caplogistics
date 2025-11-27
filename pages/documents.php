@@ -2,7 +2,7 @@
 session_start(); 
 
 if (!isset($_SESSION['id'])) {
-    header('Location:http://localhost/caplog1');
+    header('Location:https://log1.imarketph.com');
     exit();
 }
 include '../layout/adminLayout.php';
@@ -91,7 +91,7 @@ $children = <<<'HTML'
 
 <script>
 (function(){
-    const API_URL = 'http://localhost/caplog1/api/documents.php';
+    const API_URL = 'https://log1.imarketph.com/api/documents.php';
 
     const grid = document.getElementById('docsGrid');
     const openModalBtn = document.getElementById('openModal');
