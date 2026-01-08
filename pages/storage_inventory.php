@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
-    header('Location:https://log1.imarketph.com');
+    header('Location:http://localhost/caplog1');
     exit();
 }
 include '../layout/adminLayout.php';
@@ -22,7 +22,9 @@ $children = <<<'HTML'
         <div class="flex flex-col md:flex-row items-center gap-4">
             <label class="text-gray-700 font-medium whitespace-nowrap">Search:</label>
             <input id="searchInput" type="text" placeholder="Search by SKU or Product Name..." class="w-full md:w-48 border rounded px-3 py-2" />
-            <button id="applySearch" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">Search</button>
+            <input type="date" id="dateFrom" class="border rounded px-3 py-2 text-sm">
+            <input type="date" id="dateTo" class="border rounded px-3 py-2 text-sm">
+            <button id="applySearch" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">Filter</button>
             <button id="clearSearch" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition">Clear</button>
         </div>
     </div>

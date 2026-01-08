@@ -68,7 +68,7 @@
 
 📄 setup_supplier_table.php
    ├─ Can auto-create table
-   ├─ Visit: https://log1.imarketph.com/setup_supplier_table.php
+   ├─ Visit: http://localhost/caplog1/setup_supplier_table.php
    └─ Use if: You can't access phpMyAdmin
 
 ═════════════════════════════════════════════════════════════════════════════════
@@ -167,7 +167,7 @@ Indexes:
 ☐ 5. Click: SQL tab
 ☐ 6. Paste: The SQL
 ☐ 7. Click: GO button
-☐ 8. Visit: https://log1.imarketph.com/pages/supplier_identification.php
+☐ 8. Visit: http://localhost/caplog1/pages/supplier_identification.php
 ☐ 9. Verify: 3 suppliers display
 ☐ 10. Test: Add new supplier
 ☐ 11. Done: Module 1 is working!

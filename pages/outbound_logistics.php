@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
-    header('Location:https://log1.imarketph.com');
+    header('Location:http://localhost/caplog1');
     exit();
 }
 include '../layout/adminLayout.php';
@@ -74,7 +74,7 @@ $children = <<<'HTML'
             </div>
             <div>
                 <label class="block text-gray-700 font-medium">Total Items</label>
-                <input id="total_items" type="number" class="w-full border rounded px-3 py-2" placeholder="0" />
+                <input id="total_items" type="number" class="w-full border rounded px-3 py-2" readonly />
             </div>
             <div>
                 <label class="block text-gray-700 font-medium">Carrier Name</label>
@@ -91,12 +91,62 @@ $children = <<<'HTML'
                     <option value="Delivered">Delivered</option>
                 </select>
             </div>
+            <!-- STEP 4: Outbound Items -->
+            <div class="border-t pt-4">
+                <h3 class="font-semibold mb-2 text-gray-800">Outbound Items</h3>
+
+                <label class="block text-sm text-gray-600 mb-1">Select Product</label>
+                <select id="inventorySelect" class="w-full border rounded px-3 py-2 mb-2"></select>
+
+                <label class="block text-sm text-gray-600 mb-1">Quantity</label>
+                <input id="outQty" type="number" min="1"
+                    class="w-full border rounded px-3 py-2 mb-2"
+                    placeholder="Enter quantity">
+
+                <label class="block text-sm text-gray-600 mb-1">Department</label>
+                <select id="department" class="w-full border rounded px-3 py-2 mb-2">
+                    <option value="Sales">Sales</option>
+                    <option value="Operations">Operations</option>
+                    <option value="Warehouse">Warehouse</option>
+                    <option value="IT">IT</option>
+                </select>
+
+                <button type="button" id="addItem"
+                    class="bg-green-600 text-white px-3 py-2 rounded w-full hover:bg-green-700">
+                    + Add Item
+                </button>
+
+                <ul id="itemList" class="mt-3 text-sm text-gray-700 space-y-1"></ul>
+            </div>
+
             <div class="flex justify-end gap-2">
                 <button type="button" id="closeModal" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
                 <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Save Shipment</button>
             </div>
         </form>
         <button id="closeModalBtn" class="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-2xl">&times;</button>
+    </div>
+</div>
+
+<div id="viewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50 overflow-y-auto">
+    <div class="bg-white rounded-lg shadow-lg w-96 p-6 relative my-8">
+        <h2 class="text-2xl font-bold mb-4">Shipment Details</h2>
+        <div class="space-y-4">
+            <div><strong>Shipment Number:</strong> <span id="view_shipment_number"></span></div>
+            <div><strong>Order ID:</strong> <span id="view_order_id"></span></div>
+            <div><strong>Customer Name:</strong> <span id="view_customer_name"></span></div>
+            <div><strong>Customer Email:</strong> <span id="view_customer_email"></span></div>
+            <div><strong>Delivery Address:</strong> <span id="view_delivery_address"></span></div>
+            <div><strong>Total Items:</strong> <span id="view_total_items"></span></div>
+            <div><strong>Carrier Name:</strong> <span id="view_carrier_name"></span></div>
+            <div><strong>Status:</strong> <span id="view_delivery_status"></span></div>
+            <div><strong>Notes:</strong> <span id="view_notes"></span></div>
+            <div>
+                <strong>Outbound Items:</strong>
+                <ul id="view_item_list" class="mt-2 text-sm text-gray-700 space-y-1"></ul>
+            </div>
+        </div>
+        <button id="closeViewModal" class="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-2xl">&times;</button>
     </div>
 </div>
 

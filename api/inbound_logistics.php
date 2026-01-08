@@ -10,10 +10,7 @@ if (!isset($_SESSION['id'])) {
 }
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-$input = json_decode(file_get_contents('php://input'), true);
-if (!is_array($input)) { 
-    $input = []; 
-}
+$input = json_decode(file_get_contents('php://input'), true) ?? [];
 
 function json_response($data, int $code = 200) {
     http_response_code($code);
@@ -23,92 +20,135 @@ function json_response($data, int $code = 200) {
 
 try {
     switch ($method) {
+
+        /* =======================
+           GET (SEARCH + DATE)
+        ======================== */
         case 'GET':
-            $search = isset($_GET['search']) ? trim($_GET['search']) : '';
-            
-            $sql = "SELECT * FROM inbound_logistics ORDER BY created_at DESC";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute();
-            $shipments = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            if ($search) {
-                $shipments = array_filter($shipments, function($s) use ($search) {
-                    return stripos($s['shipment_id'] ?? '', $search) !== false || 
-                           stripos($s['supplier_name'] ?? '', $search) !== false;
-                });
+            $search    = trim($_GET['search'] ?? '');
+            $fromDate  = $_GET['from_date'] ?? '';
+            $toDate    = $_GET['to_date'] ?? '';
+            $status = $_GET['status'] ?? '';
+
+            $where = [];
+            $params = [];
+
+            if ($search !== '') {
+                $where[] = "(shipment_id LIKE :search OR supplier_name LIKE :search)";
+                $params[':search'] = "%{$search}%";
             }
-            
-            json_response(['status' => 'success', 'shipments' => array_values($shipments)]);
+
+            if ($fromDate !== '' && $toDate !== '') {
+                $where[] = "DATE(created_at) BETWEEN :from_date AND :to_date";
+                $params[':from_date'] = $fromDate;
+                $params[':to_date'] = $toDate;
+            } elseif ($fromDate !== '') {
+                $where[] = "DATE(created_at) >= :from_date";
+                $params[':from_date'] = $fromDate;
+            } elseif ($toDate !== '') {
+                $where[] = "DATE(created_at) <= :to_date";
+                $params[':to_date'] = $toDate;
+            }
+
+            if ($status !== '') {
+                $where[] = "status = :status";
+                $params[':status'] = $status;
+            }
+
+            $sql = "SELECT * FROM inbound_logistics";
+
+            if ($where) {
+                $sql .= " WHERE " . implode(" AND ", $where);
+            }
+
+            $sql .= " ORDER BY created_at DESC";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->execute($params);
+            $shipments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            json_response([
+                'status' => 'success',
+                'shipments' => $shipments
+            ]);
             break;
 
+        /* =======================
+           POST (CREATE)
+        ======================== */
         case 'POST':
-            $shipment_id = $input['shipment_id'] ?? '';
-            $po_number = $input['po_number'] ?? '';
-            $supplier_name = $input['supplier_name'] ?? '';
-            $total_items = intval($input['total_items'] ?? 0);
-            $quality_status = $input['quality_status'] ?? 'Pending';
-            $handler_name = $input['handler_name'] ?? '';
-            $status = $input['status'] ?? 'Pending';
-            $notes = $input['notes'] ?? '';
-
-            if (empty($shipment_id) || empty($supplier_name)) {
+            if (empty($input['shipment_id']) || empty($input['supplier_name'])) {
                 json_response(['status' => 'error', 'message' => 'Shipment ID and Supplier Name are required'], 400);
             }
 
-            try {
-                $sql = "INSERT INTO inbound_logistics (shipment_id, po_number, supplier_name, total_items, quality_status, handler_name, status, notes, created_at) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
-                $stmt = $conn->prepare($sql);
-                $stmt->execute([$shipment_id, $po_number, $supplier_name, $total_items, $quality_status, $handler_name, $status, $notes]);
+            $stmt = $conn->prepare("
+                INSERT INTO inbound_logistics
+                (shipment_id, po_number, supplier_name, total_items, quality_status, handler_name, status, notes, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+            ");
 
-                json_response(['status' => 'success', 'message' => 'Shipment added successfully']);
-            } catch (Exception $e) {
-                json_response(['status' => 'error', 'message' => 'Database error: ' . $e->getMessage()], 500);
-            }
+            $stmt->execute([
+                $input['shipment_id'],
+                $input['po_number'] ?? '',
+                $input['supplier_name'],
+                intval($input['total_items'] ?? 0),
+                $input['quality_status'] ?? 'Pending',
+                $input['handler_name'] ?? '',
+                $input['status'] ?? 'Pending',
+                $input['notes'] ?? ''
+            ]);
+
+            json_response(['status' => 'success', 'message' => 'Shipment added successfully']);
             break;
 
+        /* =======================
+           PUT (UPDATE)
+        ======================== */
         case 'PUT':
-            $id = $input['id'] ?? '';
-            $shipment_id = $input['shipment_id'] ?? '';
-            $supplier_name = $input['supplier_name'] ?? '';
-            $items_received = intval($input['items_received'] ?? 0);
-            $items_verified = intval($input['items_verified'] ?? 0);
-            $quality_status = $input['quality_status'] ?? 'Pending';
-            $storage_location = $input['storage_location'] ?? '';
-            $status = $input['status'] ?? 'Pending';
-            $notes = $input['notes'] ?? '';
-
-            if (empty($id)) {
-                json_response(['status' => 'error', 'message' => 'Shipment ID is required'], 400);
+            if (empty($input['id'])) {
+                json_response(['status' => 'error', 'message' => 'ID is required'], 400);
             }
 
-            try {
-                $sql = "UPDATE inbound_logistics SET shipment_id=?, supplier_name=?, items_received=?, items_verified=?, quality_status=?, storage_location=?, status=?, notes=? WHERE id = ?";
-                $stmt = $conn->prepare($sql);
-                $stmt->execute([$shipment_id, $supplier_name, $items_received, $items_verified, $quality_status, $storage_location, $status, $notes, $id]);
+            $stmt = $conn->prepare("
+                UPDATE inbound_logistics SET
+                    shipment_id = ?,
+                    po_number = ?,
+                    supplier_name = ?,
+                    total_items = ?,
+                    quality_status = ?,
+                    handler_name = ?,
+                    status = ?,
+                    notes = ?
+                WHERE id = ?
+            ");
 
-                json_response(['status' => 'success', 'message' => 'Shipment updated successfully']);
-            } catch (Exception $e) {
-                json_response(['status' => 'error', 'message' => 'Database error: ' . $e->getMessage()], 500);
-            }
+            $stmt->execute([
+                $input['shipment_id'],
+                $input['po_number'] ?? '',
+                $input['supplier_name'],
+                intval($input['total_items'] ?? 0),
+                $input['quality_status'] ?? 'Pending',
+                $input['handler_name'] ?? '',
+                $input['status'] ?? 'Pending',
+                $input['notes'] ?? '',
+                $input['id']
+            ]);
+
+            json_response(['status' => 'success', 'message' => 'Shipment updated successfully']);
             break;
 
+        /* =======================
+           DELETE
+        ======================== */
         case 'DELETE':
-            $id = $input['id'] ?? '';
-            
-            if (empty($id)) {
-                json_response(['status' => 'error', 'message' => 'Shipment ID is required'], 400);
+            if (empty($input['id'])) {
+                json_response(['status' => 'error', 'message' => 'ID is required'], 400);
             }
 
-            try {
-                $sql = "DELETE FROM inbound_logistics WHERE id = ?";
-                $stmt = $conn->prepare($sql);
-                $stmt->execute([$id]);
+            $stmt = $conn->prepare("DELETE FROM inbound_logistics WHERE id = ?");
+            $stmt->execute([$input['id']]);
 
-                json_response(['status' => 'success', 'message' => 'Shipment deleted successfully']);
-            } catch (Exception $e) {
-                json_response(['status' => 'error', 'message' => 'Database error: ' . $e->getMessage()], 500);
-            }
+            json_response(['status' => 'success', 'message' => 'Shipment deleted successfully']);
             break;
 
         default:

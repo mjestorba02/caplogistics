@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
-    header('Location:https://log1.imarketph.com');
+    header('Location:http://localhost/caplog1');
     exit();
 }
 include '../layout/adminLayout.php';
@@ -19,11 +19,51 @@ $children = <<<'HTML'
     </div>
 
     <div class="bg-white p-4 rounded-lg shadow mb-6">
-        <div class="flex flex-col md:flex-row items-center gap-4">
-            <label class="text-gray-700 font-medium whitespace-nowrap">Search:</label>
-            <input id="searchInput" type="text" placeholder="Search by Shipment ID or Supplier..." class="w-full md:w-48 border rounded px-3 py-2" />
-            <button id="applySearch" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">Search</button>
-            <button id="clearSearch" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition">Clear</button>
+        <div class="flex flex-col md:flex-row items-end gap-4">
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Search</label>
+                <input id="searchInput" type="text" placeholder="Shipment ID or Supplier"
+                    class="w-full md:w-48 border rounded px-3 py-2" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Status</label>
+                <select id="statusFilter"
+                    class="border rounded px-3 py-2 w-full md:w-48">
+                    <option value="">All Status</option>
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Received">Received</option>
+                    <option value="Verified">Verified</option>
+                    <option value="Putaway Complete">Putaway Complete</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">From Date</label>
+                <input id="dateFrom" type="date"
+                    class="border rounded px-3 py-2 w-full md:w-40" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">To Date</label>
+                <input id="dateTo" type="date"
+                    class="border rounded px-3 py-2 w-full md:w-40" />
+            </div>
+
+            <div class="flex gap-2">
+                <button id="applySearch"
+                    class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">
+                    Filter
+                </button>
+
+                <button id="clearSearch"
+                    class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition">
+                    Clear
+                </button>
+            </div>
+
         </div>
     </div>
 

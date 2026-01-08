@@ -27,20 +27,38 @@ document.addEventListener('DOMContentLoaded', () => {
     closeModalBtn.addEventListener('click', closeModal);
     closeBtn.addEventListener('click', closeModal);
 
-    async function fetchItems(search = '') {
+    async function fetchItems() {
         try {
-            const url = `../api/storage_inventory.php${search ? '?search=' + encodeURIComponent(search) : ''}`;
+            const search   = document.getElementById('searchInput').value;
+            const dateFrom = document.getElementById('dateFrom')?.value || '';
+            const dateTo   = document.getElementById('dateTo')?.value || '';
+
+            const params = new URLSearchParams();
+
+            if (search)   params.append('search', search);
+            if (dateFrom) params.append('date_from', dateFrom);
+            if (dateTo)   params.append('date_to', dateTo);
+
+            const url = `../api/storage_inventory.php?${params.toString()}`;
+
             const res = await fetch(url);
             const data = await res.json();
-            if (data.status === 'success' && Array.isArray(data.items) && data.items.length) {
+
+            if (data.status === 'success' && data.items.length) {
                 renderItems(data.items);
             } else {
                 tableBody.innerHTML = '';
                 emptyState.classList.remove('hidden');
             }
         } catch (err) {
-            console.error('Error fetching items:', err);
-            Toastify({ text: 'Error loading items', duration: 3000, gravity: 'top', position: 'right', backgroundColor: '#ef4444' }).showToast();
+            console.error(err);
+            Toastify({
+                text: 'Error loading items',
+                duration: 3000,
+                gravity: 'top',
+                position: 'right',
+                backgroundColor: '#ef4444'
+            }).showToast();
         }
     }
 
@@ -120,8 +138,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    applySearchBtn.addEventListener('click', () => fetchItems(document.getElementById('searchInput').value));
-    clearSearchBtn.addEventListener('click', () => { document.getElementById('searchInput').value = ''; fetchItems(); });
+    applySearchBtn.addEventListener('click', fetchItems);
+
+    clearSearchBtn.addEventListener('click', () => {
+        document.getElementById('searchInput').value = '';
+        if (document.getElementById('dateFrom')) document.getElementById('dateFrom').value = '';
+        if (document.getElementById('dateTo')) document.getElementById('dateTo').value = '';
+        fetchItems();
+    });
 
     window.deleteItem = deleteItem;
     window.editItem = editItem;

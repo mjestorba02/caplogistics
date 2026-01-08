@@ -69,70 +69,46 @@ function adminLayout($children) {
     'title' => 'Procurement',
     'icon' => 'bx-purchase-tag-alt',
     'subs' => [
-      ['title' => 'Supplier Identification & Pre-Qualification', 'link' => 'supplier_identification.php'],
-      ['title' => 'Supplier Evaluation & Selection', 'link' => 'supplier_evaluation.php'],
-      ['title' => 'Procurement Planning & Requisition', 'link' => 'procurement_planning.php'],
-      ['title' => 'Purchase Order (PO) Management', 'link' => 'po_management.php'],
-      ['title' => 'Receiving & Quality Assurance', 'link' => 'receiving_quality.php'],
-      ['title' => 'Supplier Relationship Management', 'link' => 'supplier_relationship.php'],
-      ['title' => 'Payment & Compliance', 'link' => 'payment_compliance.php'],
-      ['title' => 'Procurement Reports & Contracts', 'link' => 'procurement_reports.php'],
-    ]
-  ],
-  [
-    'title' => 'Asset Lifecycle & Maintenance',
-    'icon' => 'bx-recycle',
-    'subs' => [
-      ['title' => 'Receiving & Logistics Intake', 'link' => 'asset_receiving_logistics.php'],
-      ['title' => 'Onboarding & Registration', 'link' => 'asset_onboarding_registration.php'],
-      ['title' => 'Deployment & Operational Life', 'link' => 'asset_deployment_lifecycle.php'],
-      ['title' => 'Maintenance & Servicing', 'link' => 'asset_maintenance_servicing.php'],
-      ['title' => 'End-of-Life & Disposal', 'link' => 'asset_end_of_life_disposal.php'],
-    ]
-  ],
-  [
-    'title' => 'Logistics Tracking',
-    'icon' => 'bx-map',
-    'subs' => [
-      ['title' => 'Shipments & Deliveries', 'link' => 'deliveries.php'],
-      ['title' => 'Milestones & Status Updates', 'link' => 'milestones.php'],
-      // ['title' => 'Logistics Performance', 'link' => 'logistics_performance.php'],
+      ['title' => 'Request Supplies', 'link' => 'request_supplies.php'],
+      ['title' => 'Create Purchase Order', 'link' => 'po_management.php'],
+      ['title' => 'Create Contract and Reports', 'link' => 'create_contract_reports.php'],
     ]
   ],
   [
     'title' => 'Asset Management',
     'icon' => 'bx-cube-alt',
     'subs' => [
-      ['title' => 'Asset Registration & Usage', 'link' => 'asset_registration.php'],
-      ['title' => 'Maintenance Scheduling', 'link' => 'maintenance_schedule.php'],
-      ['title' => 'Lifecycle & Replacement', 'link' => 'lifecycle_replacement.php'],
+      ['title' => 'Asset Management', 'link' => 'asset_management.php'],
     ]
   ],
   [
-      'title' => 'Document Tracking & Logistics Records',
+    'title' => 'Logistic Tracking',
+    'icon' => 'bx-map',
+    'subs' => [
+      ['title' => 'Project Planning and Request', 'link' => 'project_planning_request.php'],
+      ['title' => 'Project Status', 'link' => 'project_status.php'],
+      ['title' => 'Request Contract', 'link' => 'request_contract.php'],
+      ['title' => 'Reports', 'link' => 'logistic_reports.php'],
+    ]
+  ],
+  // [
+  //   'title' => 'Asset Management',
+  //   'icon' => 'bx-cube-alt',
+  //   'subs' => [
+  //     ['title' => 'Asset Registration & Usage', 'link' => 'asset_registration.php'],
+  //     ['title' => 'Maintenance Scheduling', 'link' => 'maintenance_schedule.php'],
+  //     ['title' => 'Lifecycle & Replacement', 'link' => 'lifecycle_replacement.php'],
+  //   ]
+  // ],
+  [
+      'title' => 'Document Tracking',
       'icon' => 'bx-folder',
       'subs' => [
-          ['title' => 'Document Creation & Capture', 'link' => 'document_creation_capture.php'],
-          ['title' => 'Document Verification & Validation', 'link' => 'document_verification_validation.php'],
-          ['title' => 'Secure Storage & Organization', 'link' => 'secure_storage_organization.php'],
-          ['title' => 'Document Tracking & Visibility', 'link' => 'document_tracking_visibility.php'],
-          ['title' => 'Integration with Logistics Operations', 'link' => 'integration_logistics_operations.php'],
-          ['title' => 'Retention & Compliance Management', 'link' => 'retention_compliance_management.php'],
-          ['title' => 'Analytics & Reporting', 'link' => 'analytics_reporting.php'],
+          ['title' => 'Document Request', 'link' => 'document_request.php'],
+          ['title' => 'List of Document Request', 'link' => 'list_document_request.php'],
+          ['title' => 'Upload Document and Tracking', 'link' => 'upload_document_tracking.php'],
+          ['title' => 'Reports', 'link' => 'document_reports.php'],
       ]
-  ],
-  [
-    'title' => 'Project Logistics Tracker',
-    'icon' => 'bx-briefcase',
-    'subs' => [
-      ['title' => 'Project Requirement Planning', 'link' => 'project_requirement_planning.php'],
-      ['title' => 'Procurement & Supplier Coordination', 'link' => 'procurement_supplier_coordination.php'],
-      ['title' => 'Shipment Scheduling & Route Planning', 'link' => 'shipment_scheduling_route_planning.php'],
-      ['title' => 'Execution & Real-Time Tracking', 'link' => 'execution_realtime_tracking.php'],
-      ['title' => 'Customs & Regulatory Compliance', 'link' => 'customs_regulatory_compliance.php'],
-      ['title' => 'Delivery & Site Coordination', 'link' => 'delivery_site_coordination.php'],
-      ['title' => 'Project Performance Monitoring & Closure', 'link' => 'project_performance_monitoring_closure.php'],
-    ]
   ],
     ['title'=>'Admin Settings','icon'=>'bx-cog','subs'=>[
         ['title'=>'Users & Roles','link'=>'usersRoles.php'],
@@ -304,11 +280,11 @@ window.addEventListener('click', e => {
 // Logout
 async function logoutUser() {
     try {
-        const res = await fetch('https://log1.imarketph.com/api/logout.php', { method: 'POST' });
+        const res = await fetch('http://localhost/caplog1/api/logout.php', { method: 'POST' });
         const data = await res.json();
         Toastify({ text: data.message || 'Logged out', duration: 3000 }).showToast();
         if (data.status === 'success') {
-            setTimeout(() => window.location.href = 'https://log1.imarketph.com', 1000);
+            setTimeout(() => window.location.href = 'http://localhost/caplog1', 1000);
         }
     } catch (e) {
         console.error(e);

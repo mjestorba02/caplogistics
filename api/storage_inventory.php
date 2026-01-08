@@ -24,21 +24,62 @@ function json_response($data, int $code = 200) {
 try {
     switch ($method) {
         case 'GET':
-            $search = isset($_GET['search']) ? trim($_GET['search']) : '';
-            
-            $sql = "SELECT * FROM storage_inventory ORDER BY created_at DESC";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute();
-            $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            if ($search) {
-                $items = array_filter($items, function($item) use ($search) {
-                    return stripos($item['sku'] ?? '', $search) !== false || 
-                           stripos($item['product_name'] ?? '', $search) !== false;
-                });
+            // MODE: inventory selector for outbound
+            if (isset($_GET['mode']) && $_GET['mode'] === 'outbound') {
+
+                $stmt = $conn->query("
+                    SELECT id, sku, product_name, available_stock
+                    FROM storage_inventory
+                    WHERE available_stock > 0
+                    ORDER BY product_name
+                ");
+
+                json_response([
+                    'status' => 'success',
+                    'items' => $stmt->fetchAll(PDO::FETCH_ASSOC)
+                ]);
             }
-            
-            json_response(['status' => 'success', 'items' => array_values($items)]);
+
+            // DEFAULT inventory listing (existing behavior)
+            $search = trim($_GET['search'] ?? '');
+            $dateFrom = $_GET['date_from'] ?? '';
+            $dateTo   = $_GET['date_to'] ?? '';
+
+            $conditions = [];
+            $params = [];
+
+            if ($search !== '') {
+                $conditions[] = "(sku LIKE ? OR product_name LIKE ?)";
+                $params[] = "%$search%";
+                $params[] = "%$search%";
+            }
+
+            if ($dateFrom !== '') {
+                $conditions[] = "DATE(created_at) >= ?";
+                $params[] = $dateFrom;
+            }
+
+            if ($dateTo !== '') {
+                $conditions[] = "DATE(created_at) <= ?";
+                $params[] = $dateTo;
+            }
+
+            $where = $conditions ? "WHERE " . implode(" AND ", $conditions) : "";
+
+            $sql = "
+                SELECT *
+                FROM storage_inventory
+                $where
+                ORDER BY created_at DESC
+            ";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->execute($params);
+
+            json_response([
+                'status' => 'success',
+                'items'  => $stmt->fetchAll(PDO::FETCH_ASSOC)
+            ]);
             break;
 
         case 'POST':
@@ -58,10 +99,11 @@ try {
             }
 
             try {
-                $sql = "INSERT INTO storage_inventory (sku, product_name, category, bin_location, warehouse_zone, current_stock, min_stock, max_stock, movement_frequency, supplier_name, created_at) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+                $available_stock = $current_stock - 0; // reserved_stock default 0
+                $sql = "INSERT INTO storage_inventory (sku, product_name, category, bin_location, warehouse_zone, current_stock, min_stock, max_stock, reserved_stock, available_stock, movement_frequency, supplier_name, created_at) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, NOW())";
                 $stmt = $conn->prepare($sql);
-                $stmt->execute([$sku, $product_name, $category, $bin_location, $warehouse_zone, $current_stock, $min_stock, $max_stock, $movement_frequency, $supplier_name]);
+                $stmt->execute([$sku, $product_name, $category, $bin_location, $warehouse_zone, $current_stock, $min_stock, $max_stock, $available_stock, $movement_frequency, $supplier_name]);
 
                 json_response(['status' => 'success', 'message' => 'Item added to inventory successfully']);
             } catch (Exception $e) {
