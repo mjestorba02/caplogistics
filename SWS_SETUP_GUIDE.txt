@@ -237,7 +237,7 @@ layout/
 
 STEP 3: Test the Modules
 ────────────────────────
-1. Open http://localhost/caplog1 and log in
+1. Open https://log1.imarketph.com and log in
 
 2. Click on "Smart Warehousing" in the left sidebar
 

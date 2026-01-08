@@ -25,7 +25,7 @@ STEP-BY-STEP INSTRUCTIONS
 
 8. Wait for success message
 
-9. Refresh: http://localhost/caplog1/pages/supplier_identification.php
+9. Refresh: https://log1.imarketph.com/pages/supplier_identification.php
 
 10. You should see 3 suppliers in the table!
 
@@ -78,7 +78,7 @@ phpMyAdmin will show:
   ✓ Rows inserted: 3
   
 Then on the website:
-  ✓ Go to http://localhost/caplog1/pages/supplier_identification.php
+  ✓ Go to https://log1.imarketph.com/pages/supplier_identification.php
   ✓ You'll see 3 suppliers in the table
   ✓ "Add Supplier" button will open the modal
   ✓ You can now create, edit, and delete suppliers
@@ -90,7 +90,7 @@ IF SOMETHING GOES WRONG
 
 Error: "Table already exists"
 → This means it was already created. That's fine!
-→ Go to http://localhost/caplog1/pages/supplier_identification.php
+→ Go to https://log1.imarketph.com/pages/supplier_identification.php
 → It should work now
 
 Error: "Duplicate entry"

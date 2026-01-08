@@ -2,7 +2,7 @@
 include '../layout/adminLayout.php';
 session_start ();
 if (!isset($_SESSION['id'])) {
-    header('Location:http://localhost/caplog1');
+    header('Location:https://log1.imarketph.com');
     exit();
 }
 $children = '
@@ -175,7 +175,7 @@ function showToast(message, type) {
 }
 
 // API endpoint
-const apiUrl = "http://localhost/caplog1/api/inventory.php";
+const apiUrl = "https://log1.imarketph.com/api/inventory.php";
 let inventoryItems = [];
 let filteredItems = [];
 let categories = [];
@@ -435,7 +435,7 @@ async function editItem(id) {
         const previewImage = document.getElementById('previewImage');
         const fileInput = document.getElementById('product_photo');
         
-        if (item.product_photo_url && item.product_photo_url !== 'http://localhost/caplog1/uploads/products/') {
+        if (item.product_photo_url && item.product_photo_url !== 'https://log1.imarketph.com/uploads/products/') {
             previewImage.src = item.product_photo_url;
             preview.classList.remove('hidden');
             // Clear the file input so we don't accidentally overwrite the existing photo

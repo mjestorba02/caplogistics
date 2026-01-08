@@ -1,2 +1,2 @@
 https://zzlog1.imarketph.com
-http://localhost/caplog1
+https://log1.imarketph.com

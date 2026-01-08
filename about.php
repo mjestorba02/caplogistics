@@ -161,7 +161,7 @@
                     </form>
                    
                       <div class="dropdown">
-                        <a href="http://localhost/caplog1/pages/vendor/login.php" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" aria-expanded="false">
+                        <a href="https://log1.imarketph.com/pages/vendor/login.php" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" aria-expanded="false">
                           login
                         </a>
                       
@@ -359,7 +359,7 @@
         <section class="mb-5 text-center py-5 bg-primary text-white rounded">
             <h2 class="mb-3">Ready to Explore Our Products?</h2>
             <p class="lead mb-4">Discover the latest tech gadgets at amazing prices</p>
-            <a href="http://localhost/caplog1/pages/vendor/login.php" class="btn btn-light btn-lg">Shop Now</a>
+            <a href="https://log1.imarketph.com/pages/vendor/login.php" class="btn btn-light btn-lg">Shop Now</a>
         </section>
     </main>
 
