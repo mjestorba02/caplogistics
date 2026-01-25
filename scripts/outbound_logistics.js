@@ -134,15 +134,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         emptyState.classList.add('hidden');
         tableBody.innerHTML = data.shipments.map(s => `
-            <tr>
-                <td class="px-6 py-3">${s.id}</td>
-                <td class="px-6 py-3">${s.shipment_number}</td>
+            <tr class="border-b hover:bg-gray-50">
+                <td class="px-6 py-3 text-sm text-gray-500">#${s.id}</td>
+                <td class="px-6 py-3 font-semibold">${s.shipment_number}</td>
                 <td class="px-6 py-3">${s.order_id || ''}</td>
                 <td class="px-6 py-3">${s.customer_name}</td>
-                <td class="px-6 py-3">${s.total_items}</td>
+                <td class="px-6 py-3"><span class="px-2 py-1 rounded bg-blue-100 text-blue-800 text-xs font-semibold">${s.total_items}</span></td>
                 <td class="px-6 py-3">${s.carrier_name || ''}</td>
-                <td class="px-6 py-3">${s.delivery_status}</td>
-                <td class="px-6 py-3"><button onclick="viewShipment(${s.id})" class="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700">View</button></td>
+                <td class="px-6 py-3"><span class="px-2 py-1 rounded text-xs font-semibold ${s.delivery_status === 'Dispatched' ? 'bg-green-100 text-green-800' : s.delivery_status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800'}">${s.delivery_status}</span></td>
+                <td class="px-6 py-3 flex gap-1">
+                    ${s.delivery_status !== 'Dispatched' ? `<button onclick="shipShipment(${s.id})" class="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700" title="Mark as Shipped">
+                        <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </button>` : ''}
+                    <button onclick="viewShipment(${s.id})" class="bg-indigo-600 text-white px-2 py-1 rounded text-xs hover:bg-indigo-700" title="View Details">
+                        <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    </button>
+                </td>
             </tr>
         `).join('');
     }
@@ -173,6 +180,36 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) {
             console.error(err);
             alert('Error loading shipment details');
+        }
+    };
+
+    window.shipShipment = async (id) => {
+        try {
+            const res = await fetch('../api/outbound_logistics.php', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            });
+            const data = await res.json();
+            if (data.status === 'success') {
+                Toastify({
+                    text: data.message || 'Shipment marked as shipped!',
+                    duration: 3000,
+                    gravity: 'top',
+                    position: 'right',
+                    backgroundColor: '#10b981'
+                }).showToast();
+                fetchShipments();
+            } else throw new Error(data.message || 'Ship failed');
+        } catch (err) {
+            console.error('Ship Error:', err);
+            Toastify({
+                text: 'Error shipping: ' + (err.message || 'Unknown error'),
+                duration: 3000,
+                gravity: 'top',
+                position: 'right',
+                backgroundColor: '#ef4444'
+            }).showToast();
         }
     };
 });

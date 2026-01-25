@@ -2,7 +2,7 @@
 session_start(); 
 
 if (!isset($_SESSION['id'])) {
-    header('Location:https://log1.imarketph.com');
+    header('Location:http://localhost/caplog1');
     exit();
 }
 include '../layout/adminLayout.php';
@@ -130,7 +130,7 @@ $children = <<<'HTML'
 
 <script>
 (function(){
-    const API_URL = 'https://log1.imarketph.com/api/shipments.php';
+    const API_URL = 'http://localhost/caplog1/api/shipments.php';
     let shipments = [];
 
     const tbody = document.getElementById('shipments-tbody');

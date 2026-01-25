@@ -263,7 +263,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // API endpoint
-        const API_URL = 'https://log1.imarketph.com/api/ven_log.php';
+        const API_URL = 'http://localhost/caplog1/api/ven_log.php';
         
         // Toggle between login and register forms
         document.querySelectorAll('.auth-switch').forEach(button => {

@@ -23,9 +23,10 @@ function json_response($data, int $code = 200) {
 }
 
 try {
-    // Ensure procurement_contracts table exists
+    // Ensure procurement_contracts table exists with vendor_id for integration
     $conn->exec("CREATE TABLE IF NOT EXISTS procurement_contracts (
         id INT AUTO_INCREMENT PRIMARY KEY,
+        vendor_id INT,
         contract_title VARCHAR(255) NOT NULL,
         supplier_name VARCHAR(255) NOT NULL,
         start_date DATE NOT NULL,
@@ -35,11 +36,20 @@ try {
         status ENUM('Active', 'Expired', 'Terminated') DEFAULT 'Active',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_vendor_id (vendor_id),
         INDEX idx_supplier_name (supplier_name),
         INDEX idx_status (status),
         INDEX idx_start_date (start_date),
-        INDEX idx_end_date (end_date)
+        INDEX idx_end_date (end_date),
+        CONSTRAINT fk_vendor_id FOREIGN KEY (vendor_id) REFERENCES vendor_portal_registration(id) ON DELETE SET NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+    // Add vendor_id column if it doesn't exist (for existing databases)
+    try {
+        $conn->exec("ALTER TABLE procurement_contracts ADD COLUMN vendor_id INT, ADD CONSTRAINT fk_vendor_id FOREIGN KEY (vendor_id) REFERENCES vendor_portal_registration(id) ON DELETE SET NULL");
+    } catch (Exception $e) {
+        // Column might already exist, ignore
+    }
 
     switch ($method) {
         case 'GET':
@@ -106,6 +116,7 @@ try {
             break;
 
         case 'POST':
+            $vendor_id = !empty($input['vendor_id']) ? intval($input['vendor_id']) : null;
             $contract_title = $input['contract_title'] ?? '';
             $supplier_name = $input['supplier_name'] ?? '';
             $start_date = $input['start_date'] ?? '';
@@ -117,15 +128,16 @@ try {
                 json_response(['status' => 'error', 'message' => 'Required fields are missing'], 400);
             }
 
-            $sql = "INSERT INTO procurement_contracts (contract_title, supplier_name, start_date, end_date, contract_value, details) VALUES (?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO procurement_contracts (vendor_id, contract_title, supplier_name, start_date, end_date, contract_value, details) VALUES (?, ?, ?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($sql);
-            $stmt->execute([$contract_title, $supplier_name, $start_date, $end_date, $contract_value, $details]);
+            $stmt->execute([$vendor_id, $contract_title, $supplier_name, $start_date, $end_date, $contract_value, $details]);
 
-            json_response(['status' => 'success', 'message' => 'Contract created successfully']);
+            json_response(['status' => 'success', 'message' => 'Contract created successfully', 'id' => $conn->lastInsertId()]);
             break;
 
         case 'PUT':
             $id = $input['id'] ?? '';
+            $vendor_id = !empty($input['vendor_id']) ? intval($input['vendor_id']) : null;
             $contract_title = $input['contract_title'] ?? '';
             $supplier_name = $input['supplier_name'] ?? '';
             $start_date = $input['start_date'] ?? '';
@@ -137,9 +149,9 @@ try {
                 json_response(['status' => 'error', 'message' => 'ID and required fields are missing'], 400);
             }
 
-            $sql = "UPDATE procurement_contracts SET contract_title=?, supplier_name=?, start_date=?, end_date=?, contract_value=?, details=? WHERE id = ?";
+            $sql = "UPDATE procurement_contracts SET vendor_id=?, contract_title=?, supplier_name=?, start_date=?, end_date=?, contract_value=?, details=? WHERE id = ?";
             $stmt = $conn->prepare($sql);
-            $stmt->execute([$contract_title, $supplier_name, $start_date, $end_date, $contract_value, $details, $id]);
+            $stmt->execute([$vendor_id, $contract_title, $supplier_name, $start_date, $end_date, $contract_value, $details, $id]);
 
             json_response(['status' => 'success', 'message' => 'Contract updated successfully']);
             break;

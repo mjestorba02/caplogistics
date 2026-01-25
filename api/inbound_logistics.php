@@ -83,8 +83,8 @@ try {
 
             $stmt = $conn->prepare("
                 INSERT INTO inbound_logistics
-                (shipment_id, po_number, supplier_name, total_items, quality_status, handler_name, status, notes, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                (shipment_id, po_number, supplier_name, total_items, items_received, items_verified, quality_status, handler_name, status, notes, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
             ");
 
             $stmt->execute([
@@ -92,6 +92,8 @@ try {
                 $input['po_number'] ?? '',
                 $input['supplier_name'],
                 intval($input['total_items'] ?? 0),
+                intval($input['items_received'] ?? 0),
+                intval($input['items_verified'] ?? 0),
                 $input['quality_status'] ?? 'Pending',
                 $input['handler_name'] ?? '',
                 $input['status'] ?? 'Pending',
@@ -115,6 +117,8 @@ try {
                     po_number = ?,
                     supplier_name = ?,
                     total_items = ?,
+                    items_received = ?,
+                    items_verified = ?,
                     quality_status = ?,
                     handler_name = ?,
                     status = ?,
@@ -127,6 +131,8 @@ try {
                 $input['po_number'] ?? '',
                 $input['supplier_name'],
                 intval($input['total_items'] ?? 0),
+                intval($input['items_received'] ?? 0),
+                intval($input['items_verified'] ?? 0),
                 $input['quality_status'] ?? 'Pending',
                 $input['handler_name'] ?? '',
                 $input['status'] ?? 'Pending',
@@ -149,6 +155,102 @@ try {
             $stmt->execute([$input['id']]);
 
             json_response(['status' => 'success', 'message' => 'Shipment deleted successfully']);
+            break;
+
+        /* =======================
+           PATCH (APPROVE/ACCEPT SHIPMENT)
+        ======================== */
+        case 'PATCH':
+            if (empty($input['id'])) {
+                json_response(['status' => 'error', 'message' => 'ID is required'], 400);
+            }
+
+            // Get the shipment details
+            $stmt = $conn->prepare("SELECT * FROM inbound_logistics WHERE id = ?");
+            $stmt->execute([$input['id']]);
+            $shipment = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$shipment) {
+                json_response(['status' => 'error', 'message' => 'Shipment not found'], 404);
+            }
+
+            try {
+                // Begin transaction
+                $conn->beginTransaction();
+
+                // Update shipment status to "Putaway Complete" (approved for storage)
+                $stmt = $conn->prepare("
+                    UPDATE inbound_logistics 
+                    SET status = 'Putaway Complete', updated_at = NOW()
+                    WHERE id = ?
+                ");
+                $stmt->execute([$input['id']]);
+
+                // Create item in storage_inventory from the shipment data
+                // Use items_received as the current_stock and available_stock
+                $stmt = $conn->prepare("
+                    INSERT INTO storage_inventory 
+                    (sku, product_name, category, bin_location, warehouse_zone, current_stock, 
+                     min_stock, max_stock, reserved_stock, available_stock, movement_frequency, 
+                     supplier_name, supplier_id, stock_status, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+                ");
+
+                // Extract details from shipment
+                $sku = 'SKU-' . str_replace(' ', '-', $shipment['shipment_id']);
+                $product_name = 'Shipment ' . $shipment['shipment_id'] . ' from ' . $shipment['supplier_name'];
+                $category = $input['category'] ?? 'Received';
+                $bin_location = $input['bin_location'] ?? 'PENDING-LOCATION';
+                $warehouse_zone = $input['warehouse_zone'] ?? 'ZONE-INBOUND';
+                
+                // Use items_received as current_stock, if not provided use total_items
+                $items_received = intval($shipment['items_received'] ?? $shipment['total_items'] ?? 0);
+                $current_stock = $items_received;
+                $min_stock = intval($shipment['total_items'] ?? 100) * 0.1; // 10% of total
+                $max_stock = intval($shipment['total_items'] ?? 100) * 2; // 200% of total
+                $available_stock = $current_stock; // All received items are available
+                $reserved_stock = 0;
+                $movement_frequency = $input['movement_frequency'] ?? 'Medium';
+                
+                // Determine stock status based on received vs expected
+                if ($items_received == intval($shipment['total_items'] ?? 0)) {
+                    $stock_status = 'Optimal';
+                } elseif ($items_received >= intval($shipment['total_items'] ?? 0) * 0.8) {
+                    $stock_status = 'Low';
+                } else {
+                    $stock_status = 'Critical';
+                }
+
+                $stmt->execute([
+                    $sku,
+                    $product_name,
+                    $category,
+                    $bin_location,
+                    $warehouse_zone,
+                    $current_stock,
+                    $min_stock,
+                    $max_stock,
+                    $reserved_stock,
+                    $available_stock,
+                    $movement_frequency,
+                    $shipment['supplier_name'],
+                    null, // supplier_id
+                    $stock_status
+                ]);
+
+                // Commit transaction
+                $conn->commit();
+
+                json_response([
+                    'status' => 'success', 
+                    'message' => 'Shipment approved! ' . $items_received . ' items moved to Storage & Inventory'
+                ]);
+
+            } catch (Throwable $e) {
+                // Rollback transaction on error
+                $conn->rollBack();
+                json_response(['status' => 'error', 'message' => 'Error approving shipment: ' . $e->getMessage()], 500);
+            }
             break;
 
         default:

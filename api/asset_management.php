@@ -14,7 +14,32 @@ if (!isset($_SESSION['id'])) {
 }
 
 $method = $_SERVER['REQUEST_METHOD'];
-$input = json_decode(file_get_contents('php://input'), true) ?? [];
+$input = [];
+
+// Handle FormData (file uploads) and JSON
+if ($method === 'POST' || $method === 'PUT') {
+    if (strpos($_SERVER['CONTENT_TYPE'] ?? '', 'multipart/form-data') !== false) {
+        // FormData upload
+        $input = $_POST;
+        // Handle file upload
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = __DIR__ . '/../uploads/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+            $fileName = time() . '_' . basename($_FILES['image']['name']);
+            $uploadPath = $uploadDir . $fileName;
+            if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadPath)) {
+                $input['image'] = '/caplog1/uploads/' . $fileName;
+            }
+        }
+    } else {
+        // JSON data
+        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+    }
+} else {
+    $input = json_decode(file_get_contents('php://input'), true) ?? [];
+}
 
 function json_response($data, int $code = 200) {
     http_response_code($code);
@@ -27,14 +52,17 @@ try {
     $conn->exec("CREATE TABLE IF NOT EXISTS asset_management (
         id INT AUTO_INCREMENT PRIMARY KEY,
         item_number VARCHAR(255) NOT NULL UNIQUE,
-        qr_code VARCHAR(255) NULL,
-        status ENUM('Release', 'InTransit', 'Pending') DEFAULT 'Pending',
-        description TEXT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        image VARCHAR(255) NULL,
+        type_of_asset VARCHAR(100) NULL,
+        item_code VARCHAR(100) NULL,
+        item_name VARCHAR(255) NULL,
+        status ENUM('Active', 'Inactive', 'Maintenance', 'Retired') DEFAULT 'Active',
+        purchase_date DATE NULL,
+        lifespan_years INT DEFAULT 5,
+        date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         INDEX idx_item_number (item_number),
         INDEX idx_status (status)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+    )");
 
     switch ($method) {
         case 'GET':
@@ -56,7 +84,24 @@ try {
 
             $where = $conditions ? "WHERE " . implode(" AND ", $conditions) : "";
 
-            $sql = "SELECT * FROM asset_management $where ORDER BY created_at DESC";
+            $sql = "
+                SELECT *,
+                    CASE 
+                        WHEN purchase_date IS NULL THEN 100
+                        ELSE GREATEST(
+                            0,
+                            ROUND(
+                                100 - (
+                                    (TIMESTAMPDIFF(DAY, purchase_date, CURDATE()) 
+                                    / (lifespan_years * 365)) * 100
+                                )
+                            )
+                        )
+                    END AS quality_percent
+                FROM asset_management
+                $where
+                ORDER BY date DESC
+                ";
             $stmt = $conn->prepare($sql);
             $stmt->execute($params);
 
@@ -65,17 +110,32 @@ try {
 
         case 'POST':
             $item_number = trim($input['item_number'] ?? '');
-            $qr_code = trim($input['qr_code'] ?? '');
-            $status = $input['status'] ?? 'Pending';
-            $description = $input['description'] ?? '';
+            $image = trim($input['image'] ?? '');
+            $type_of_asset = trim($input['type_of_asset'] ?? '');
+            $item_code = trim($input['item_code'] ?? '');
+            $item_name = trim($input['item_name'] ?? '');
+            $status = $input['status'] ?? 'Active';
+            $purchase_date = $input['purchase_date'] ?? null;
+            $lifespan_years = $input['lifespan_years'] ?? 5;
 
             if (empty($item_number)) {
                 json_response(['status' => 'error', 'message' => 'Item number is required'], 400);
             }
 
-            $sql = "INSERT INTO asset_management (item_number, qr_code, status, description) VALUES (?, ?, ?, ?)";
+            $sql = "INSERT INTO asset_management 
+                (item_number, image, type_of_asset, item_code, item_name, status, purchase_date, lifespan_years)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($sql);
-            $stmt->execute([$item_number, $qr_code, $status, $description]);
+            $stmt->execute([
+                $item_number,
+                $image,
+                $type_of_asset,
+                $item_code,
+                $item_name,
+                $status,
+                $purchase_date,
+                $lifespan_years
+            ]);
 
             json_response(['status' => 'success', 'message' => 'Asset added successfully']);
             break;
@@ -83,17 +143,21 @@ try {
         case 'PUT':
             $id = $input['id'] ?? '';
             $item_number = trim($input['item_number'] ?? '');
-            $qr_code = trim($input['qr_code'] ?? '');
-            $status = $input['status'] ?? 'Pending';
-            $description = $input['description'] ?? '';
+            $image = trim($input['image'] ?? '');
+            $type_of_asset = trim($input['type_of_asset'] ?? '');
+            $item_code = trim($input['item_code'] ?? '');
+            $item_name = trim($input['item_name'] ?? '');
+            $status = $input['status'] ?? 'Active';
 
             if (empty($id) || empty($item_number)) {
                 json_response(['status' => 'error', 'message' => 'ID and item number are required'], 400);
             }
 
-            $sql = "UPDATE asset_management SET item_number=?, qr_code=?, status=?, description=? WHERE id = ?";
+            $sql = "UPDATE asset_management 
+                SET item_number=?, image=?, type_of_asset=?, item_code=?, item_name=?, status=?, purchase_date=?, lifespan_years=?
+                WHERE id=?";
             $stmt = $conn->prepare($sql);
-            $stmt->execute([$item_number, $qr_code, $status, $description, $id]);
+            $stmt->execute([$item_number, $image, $type_of_asset, $item_code, $item_name, $status, $id]);
 
             json_response(['status' => 'success', 'message' => 'Asset updated successfully']);
             break;

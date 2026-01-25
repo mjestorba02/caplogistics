@@ -178,7 +178,7 @@
                     </form>
                 
                     <div class="dropdown">
-                        <a href="https://log1.imarketph.com/pages/vendor/login.php" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" aria-expanded="false">
+                        <a href="http://localhost/caplog1/pages/vendor/login.php" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" aria-expanded="false">
                           login
                         </a>
                       
@@ -193,7 +193,7 @@
         <div class="container text-center">
             <h1 class="display-4 fw-bold">Tech Deals of the Season</h1>
             <p class="lead">Up to 40% off on latest gadgets and electronics</p>
-            <a href="https://log1.imarketph.com/pages/vendor/login.php" class="btn btn-primary btn-lg mt-3">Shop Now</a>
+            <a href="http://localhost/caplog1/pages/vendor/login.php" class="btn btn-primary btn-lg mt-3">Shop Now</a>
         </div>
     </div>
 
@@ -299,8 +299,8 @@
                             <div id="modalProductStock" class="mb-3"></div>
                             <p id="modalProductDescription" class="mb-3"></p>
                                 <div class="d-grid gap-2 d-md-flex">
-                                <a class="btn btn-primary me-md-2" href="https://log1.imarketph.com/pages/vendor/login.php">Add to Cart</a>
-                                <a class="btn btn-outline-secondary" href="https://log1.imarketph.com/pages/vendor/login.php">Add to Wishlist</a>
+                                <a class="btn btn-primary me-md-2" href="http://localhost/caplog1/pages/vendor/login.php">Add to Cart</a>
+                                <a class="btn btn-outline-secondary" href="http://localhost/caplog1/pages/vendor/login.php">Add to Wishlist</a>
                             </div>
                         </div>
                     </div>
@@ -313,7 +313,7 @@
     
     <script>
         // API endpoint - replace with your actual API URL
-        const apiUrl = "https://log1.imarketph.com/api/inventory.php";
+        const apiUrl = "http://localhost/caplog1/api/inventory.php";
         
         // Function to fetch products from the API
         async function fetchProducts() {
@@ -371,7 +371,7 @@
                 }
                 
                 // Use placeholder image if no product photo is available
-                const imageUrl = product.product_photo_url && product.product_photo_url !== 'https://log1.imarketph.com/uploads/products/' 
+                const imageUrl = product.product_photo_url && product.product_photo_url !== 'http://localhost/caplog1/uploads/products/' 
                     ? product.product_photo_url 
                     : 'https://via.placeholder.com/300x200?text=Product+Image';
                 
@@ -397,8 +397,8 @@
                                         <span class="badge bg-light text-dark">Stock: ${product.stock_level}</span>
                                     </div>
                                     <div class="btn-group-sm d-flex justify-content-between">
-                                        <a class="btn btn-success" href="https://log1.imarketph.com/pages/vendor/login.php">View</a>
-                                        <a class="btn btn-warning" href="https://log1.imarketph.com/pages/vendor/login.php">${product.stock_level <= 0 ? 'Out of Stock' : 'Add to cart'}</a>
+                                        <a class="btn btn-success" href="http://localhost/caplog1/pages/vendor/login.php">View</a>
+                                        <a class="btn btn-warning" href="http://localhost/caplog1/pages/vendor/login.php">${product.stock_level <= 0 ? 'Out of Stock' : 'Add to cart'}</a>
                                     </div>
                                 </div>
                             </div>
@@ -439,7 +439,7 @@
                 product.notes || 'No detailed description available for this product.';
             
             // Set image
-            const imageUrl = product.product_photo_url && product.product_photo_url !== 'https://log1.imarketph.com/uploads/products/' 
+            const imageUrl = product.product_photo_url && product.product_photo_url !== 'http://localhost/caplog1/uploads/products/' 
                 ? product.product_photo_url 
                 : 'https://via.placeholder.com/500x400?text=Product+Image';
             document.getElementById('modalProductImage').src = imageUrl;
@@ -524,7 +524,7 @@
 
                     alert('Shipment and delivery created successfully');
                     try { if (typeof loadRecentActivity === 'function') await loadRecentActivity(); } catch (e) { /* noop */ }
-                    window.location.href = 'https://log1.imarketph.com/pages/vendor/login.php';
+                    window.location.href = 'http://localhost/caplog1/pages/vendor/login.php';
                 } catch (e) {
                     console.error(e);
                     alert('Failed to create shipment: ' + (e.message || e));

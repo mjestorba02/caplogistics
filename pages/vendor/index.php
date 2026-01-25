@@ -2,7 +2,7 @@
 session_start();
 
 if (!isset($_SESSION['vendor_id'])) {
-    header('Location: https://log1.imarketph.com/pages/vendor/login.php');
+    header('Location: http://localhost/caplog1/pages/vendor/login.php');
     exit();
 }
 ?>
@@ -417,16 +417,16 @@ if (!isset($_SESSION['vendor_id'])) {
 }
 
         // API endpoint - replace with your actual API URL
-        const apiUrl = "https://log1.imarketph.com/api/inventory.php";
-        const cartApi = "https://log1.imarketph.com/api/cart.php";
-        const wishlistApi = "https://log1.imarketph.com/api/wishlist.php";
-        const profileApi = "https://log1.imarketph.com/api/profile.php";
+        const apiUrl = "http://localhost/caplog1/api/inventory.php";
+        const cartApi = "http://localhost/caplog1/api/cart.php";
+        const wishlistApi = "http://localhost/caplog1/api/wishlist.php";
+        const profileApi = "http://localhost/caplog1/api/profile.php";
 
         // Store product data for later reference
         let allProducts = [];
 
         function buildUploadUrl(fileName) {
-            return `https://log1.imarketph.com/uploads/${fileName}`;
+            return `http://localhost/caplog1/uploads/${fileName}`;
         }
 
         async function refreshCartCount() {
@@ -589,7 +589,7 @@ if (!isset($_SESSION['vendor_id'])) {
                 }
                 
                 // Use placeholder image if no product photo is available
-                const imageUrl = product.product_photo_url && product.product_photo_url !== 'https://log1.imarketph.com/uploads/products/' 
+                const imageUrl = product.product_photo_url && product.product_photo_url !== 'http://localhost/caplog1/uploads/products/' 
                     ? product.product_photo_url 
                     : 'https://via.placeholder.com/300x200?text=Product+Image';
                 
@@ -968,7 +968,7 @@ const shipmentNumber = 'SHP-' + Date.now();
 const dispatchDate = formatDateToMySQL(new Date());
 
 // create shipment
-const sr = await fetch('https://log1.imarketph.com/api/shipments.php', {
+const sr = await fetch('http://localhost/caplog1/api/shipments.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'same-origin',
@@ -990,7 +990,7 @@ const sr = await fetch('https://log1.imarketph.com/api/shipments.php', {
 
                 // also create a delivery record linked to the shipment
                 const deliveryNumber = 'DLV-' + Date.now();
-                const dr = await fetch('https://log1.imarketph.com/api/deliveries.php', {
+                const dr = await fetch('http://localhost/caplog1/api/deliveries.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'same-origin',

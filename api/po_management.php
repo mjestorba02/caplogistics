@@ -32,14 +32,14 @@ try {
             $next_num = ($row['max_num'] ?? 0) + 1;
             $po_number = 'PO-' . str_pad($next_num, 4, '0', STR_PAD_LEFT);
             
-            $sql = "INSERT INTO purchase_orders (po_number, supplier, description, total_value, due_date, status, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())";
+            $sql = "INSERT INTO purchase_orders (po_number, request_id, supplier, description, quantity, total_value, due_date, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
             $stmt = $conn->prepare($sql);
-            $stmt->execute([$po_number, $input['supplier']??'', $input['description']??'', $input['total_value']??0, $input['due_date']??null, $input['status']??'Draft']);
+            $stmt->execute([$po_number, $input['request_id']??null, $input['supplier']??'', $input['description']??'', $input['quantity']??0, $input['total_value']??0, $input['due_date']??null, $input['status']??'Draft']);
             json_response(['status'=>'success','message'=>'PO created', 'po_number' => $po_number]);
         case 'PUT':
-            $sql = "UPDATE purchase_orders SET po_number=?, supplier=?, description=?, total_value=?, due_date=?, status=? WHERE id=?";
+            $sql = "UPDATE purchase_orders SET po_number=?, request_id=?, supplier=?, description=?, quantity=?, total_value=?, due_date=?, status=? WHERE id=?";
             $stmt = $conn->prepare($sql);
-            $stmt->execute([$input['po_number']??'', $input['supplier']??'', $input['description']??'', $input['total_value']??0, $input['due_date']??null, $input['status']??'Draft', $input['id']??0]);
+            $stmt->execute([$input['po_number']??'', $input['request_id']??null, $input['supplier']??'', $input['description']??'', $input['quantity']??0, $input['total_value']??0, $input['due_date']??null, $input['status']??'Draft', $input['id']??0]);
             json_response(['status'=>'success','message'=>'PO updated']);
         case 'DELETE':
             $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;

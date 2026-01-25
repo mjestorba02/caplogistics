@@ -2,7 +2,7 @@
 session_start(); 
 
 if (!isset($_SESSION['id'])) {
-    header('Location:https://log1.imarketph.com');
+    header('Location:http://localhost/caplog1');
     exit();
 }
 include '../layout/adminLayout.php';
@@ -77,13 +77,13 @@ $children = <<<HTML
             const parseNum = v => { if (v === null || v === undefined) return 0; const s = String(v).replace(/,/g,'').trim(); const n = parseFloat(s); return Number.isFinite(n)?n:0 };
 
             try {
-                const r = await fetch('https://log1.imarketph.com/api/analytics.php', { credentials: 'same-origin' });
+                const r = await fetch('http://localhost/caplog1/api/analytics.php', { credentials: 'same-origin' });
                 let j = null;
                 if (r.ok) j = await r.json();
 
                 // If analytics.php didn't return useful KPIs, fallback to inventory for totals
                 if (!j || (!j.total_stock_items && !j.timeseries)) {
-                    const inv = await fetch('https://log1.imarketph.com/api/inventory.php', { credentials: 'same-origin' });
+                    const inv = await fetch('http://localhost/caplog1/api/inventory.php', { credentials: 'same-origin' });
                     const items = await inv.json();
                     const totalStock = Array.isArray(items) ? items.reduce((s,it)=>s+parseNum(it.stock_level),0) : 0;
                     const lowStock = Array.isArray(items) ? items.filter(it => parseNum(it.stock_level) <= parseNum(it.reorder_level)).length : 0;

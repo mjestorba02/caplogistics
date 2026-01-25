@@ -9,10 +9,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const applyFilterBtn = document.getElementById('applyFilter');
     const clearFilterBtn = document.getElementById('clearFilter');
     const generateReportBtn = document.getElementById('generateReport');
+    const supplierSelect = document.getElementById('supplier_name');
+
+    // Load approved vendors on page load
+    async function loadApprovedVendors() {
+        try {
+            const res = await fetch('../api/vendor_portal.php?action=get_approved_vendors');
+            const data = await res.json();
+            
+            if (data.status === 'success' && data.vendors.length) {
+                // Clear existing options except the default
+                const defaultOption = supplierSelect.querySelector('option:first-child');
+                supplierSelect.innerHTML = '';
+                supplierSelect.appendChild(defaultOption);
+                
+                // Add approved vendors
+                data.vendors.forEach(vendor => {
+                    const option = document.createElement('option');
+                    option.value = vendor.vendor_name;
+                    option.textContent = vendor.vendor_name;
+                    option.dataset.vendorId = vendor.id;
+                    supplierSelect.appendChild(option);
+                });
+            }
+        } catch (err) {
+            console.error('Error loading vendors:', err);
+        }
+    }
+
+    // Update vendor_id when supplier is selected
+    supplierSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const vendorId = selectedOption.dataset.vendorId || '';
+        document.getElementById('vendor_id').value = vendorId;
+    });
 
     function openModal() {
         document.getElementById('modalTitle').textContent = 'Create Contract';
         document.getElementById('contractId').value = '';
+        document.getElementById('vendor_id').value = '';
         form.reset();
         modal.classList.remove('hidden');
         modal.classList.add('flex');
@@ -77,6 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function editContract(contract) {
         document.getElementById('modalTitle').textContent = 'Edit Contract';
         document.getElementById('contractId').value = contract.id;
+        document.getElementById('vendor_id').value = contract.vendor_id || '';
         document.getElementById('contract_title').value = contract.contract_title;
         document.getElementById('supplier_name').value = contract.supplier_name;
         document.getElementById('start_date').value = contract.start_date;
@@ -106,6 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const contractId = document.getElementById('contractId').value;
         const payload = {
             id: contractId || undefined,
+            vendor_id: document.getElementById('vendor_id').value || null,
             contract_title: document.getElementById('contract_title').value,
             supplier_name: document.getElementById('supplier_name').value,
             start_date: document.getElementById('start_date').value,
@@ -145,5 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.deleteContract = deleteContract;
     window.editContract = editContract;
 
+    // Load vendors and contracts on page load
+    loadApprovedVendors();
     fetchContracts();
 });

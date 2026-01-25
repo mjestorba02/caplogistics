@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
-    header('Location:https://log1.imarketph.com');
+    header('Location:http://localhost/caplog1');
     exit();
 }
 include '../layout/adminLayout.php';
@@ -15,7 +15,10 @@ $children = <<<'HTML'
 
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-3">
         <h1 class="text-3xl font-bold text-gray-800 mb-4 md:mb-0">Request Supplies</h1>
-        <button id="openModal" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">Request New Supply</button>
+        <button id="openModal" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Request New Supply
+        </button>
     </div>
 
     <div class="bg-white p-4 rounded-lg shadow mb-6">
@@ -24,8 +27,14 @@ $children = <<<'HTML'
             <input id="searchInput" type="text" placeholder="Search by Item or Requester..." class="w-full md:w-48 border rounded px-3 py-2" />
             <input type="date" id="dateFrom" class="border rounded px-3 py-2 text-sm">
             <input type="date" id="dateTo" class="border rounded px-3 py-2 text-sm">
-            <button id="applySearch" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">Filter</button>
-            <button id="clearSearch" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition">Clear</button>
+            <button id="applySearch" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                Filter
+            </button>
+            <button id="clearSearch" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                Clear
+            </button>
         </div>
     </div>
 
@@ -154,13 +163,27 @@ document.addEventListener('DOMContentLoaded', () => {
         emptyState.classList.add('hidden');
         tableBody.innerHTML = requests.map(r => `
             <tr class="border-b hover:bg-gray-50">
-                <td class="px-6 py-3">${r.id}</td>
-                <td class="px-6 py-3">${r.item_name}</td>
-                <td class="px-6 py-3">${r.quantity}</td>
-                <td class="px-6 py-3">${r.requester_name}</td>
-                <td class="px-6 py-3">${r.date_requested}</td>
-                <td class="px-6 py-3"><span class="px-2 py-1 rounded text-xs font-semibold ${r.status === 'Approved' ? 'bg-green-100 text-green-800' : r.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}">${r.status}</span></td>
-                <td class="px-6 py-3 flex gap-2"><button onclick='editRequest(${JSON.stringify(r).replace(/"/g, '&quot;')})' class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700">Edit</button><button onclick="deleteRequest(${r.id})" class="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700">Delete</button></td>
+                <td class="px-6 py-3 text-sm text-gray-500">#${r.id}</td>
+                <td class="px-6 py-3 font-semibold">${r.item_name}</td>
+                <td class="px-6 py-3">
+                    <span class="px-2 py-1 rounded bg-blue-100 text-blue-800 text-xs font-semibold">${r.quantity}</span>
+                </td>
+                <td class="px-6 py-3 text-sm">${r.requester_name}</td>
+                <td class="px-6 py-3 text-sm">${new Date(r.date_requested).toLocaleDateString()}</td>
+                <td class="px-6 py-3">
+                    <span class="px-2 py-1 rounded text-xs font-semibold ${r.status === 'Approved' ? 'bg-green-100 text-green-800' : r.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}">${r.status}</span>
+                </td>
+                <td class="px-6 py-3 flex gap-1">
+                    <button onclick='editRequest(${JSON.stringify(r).replace(/"/g, '&quot;')})' class="bg-indigo-600 text-white px-2 py-1 rounded text-xs hover:bg-indigo-700" title="Edit">
+                        <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    </button>
+                    ${r.status === 'Pending' ? `<button onclick="approveRequest(${r.id})" class="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700" title="Approve & Create PO">
+                        <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </button>` : ''}
+                    <button onclick="deleteRequest(${r.id})" class="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700" title="Delete">
+                        <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                </td>
             </tr>
         `).join('');
     }
@@ -187,6 +210,36 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) {
             console.error(err);
             Toastify({ text: 'Error deleting request', duration: 3000, gravity: 'top', position: 'right', backgroundColor: '#ef4444' }).showToast();
+        }
+    }
+
+    async function approveRequest(id) {
+        try {
+            const res = await fetch('../api/request_supplies.php', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            });
+            const data = await res.json();
+            if (data.status === 'success') {
+                Toastify({
+                    text: data.message || 'Request approved! Purchase Order created.',
+                    duration: 3000,
+                    gravity: 'top',
+                    position: 'right',
+                    backgroundColor: '#10b981'
+                }).showToast();
+                fetchRequests();
+            } else throw new Error(data.message || 'Approval failed');
+        } catch (err) {
+            console.error('Approve Error:', err);
+            Toastify({
+                text: 'Error approving request: ' + (err.message || 'Unknown error'),
+                duration: 3000,
+                gravity: 'top',
+                position: 'right',
+                backgroundColor: '#ef4444'
+            }).showToast();
         }
     }
 
@@ -227,6 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.deleteRequest = deleteRequest;
     window.editRequest = editRequest;
+    window.approveRequest = approveRequest;
 
     fetchRequests();
 });

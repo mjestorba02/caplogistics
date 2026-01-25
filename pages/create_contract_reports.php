@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
-    header('Location:https://log1.imarketph.com');
+    header('Location:http://localhost/caplog1');
     exit();
 }
 include '../layout/adminLayout.php';
@@ -53,13 +53,17 @@ $children = <<<'HTML'
         <h2 id="modalTitle" class="text-2xl font-bold mb-4">Create Contract</h2>
         <form id="contractForm" class="space-y-4">
             <input type="hidden" id="contractId" />
+            <input type="hidden" id="vendor_id" />
             <div>
                 <label class="block text-gray-700 font-medium">Contract Title *</label>
                 <input id="contract_title" type="text" class="w-full border rounded px-3 py-2" placeholder="e.g., Office Supplies Contract" required />
             </div>
             <div>
                 <label class="block text-gray-700 font-medium">Supplier Name *</label>
-                <input id="supplier_name" type="text" class="w-full border rounded px-3 py-2" placeholder="Supplier name" required />
+                <select id="supplier_name" class="w-full border rounded px-3 py-2" required>
+                    <option value="">-- Select from Approved Vendors --</option>
+                </select>
+                <small class="text-gray-500">Only approved vendors from the Vendor Portal are available.</small>
             </div>
             <div>
                 <label class="block text-gray-700 font-medium">Start Date *</label>

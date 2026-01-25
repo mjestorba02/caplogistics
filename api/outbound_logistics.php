@@ -148,6 +148,20 @@ try {
             json_response(['status'=>'success','message'=>'Shipment deleted']);
             break;
 
+        /* ===================== PATCH (SHIP) ===================== */
+        case 'PATCH':
+            $id = $input['id'] ?? null;
+            if (!$id) {
+                json_response(['status' => 'error', 'message' => 'ID required'], 400);
+            }
+
+            // Update delivery status to "Dispatched"
+            $stmt = $conn->prepare("UPDATE outbound_logistics SET delivery_status = 'Dispatched', actual_dispatch = NOW() WHERE id = ?");
+            $stmt->execute([$id]);
+
+            json_response(['status' => 'success', 'message' => 'Shipment marked as shipped successfully']);
+            break;
+
         default:
             json_response(['status'=>'error','message'=>'Method not allowed'],405);
     }
