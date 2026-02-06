@@ -234,22 +234,3 @@ function showToast(message, type = 'info') {
         alert(message);
     }
 }
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: requestId })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                showToast('Request deleted successfully', 'success');
-                loadMyRequests();
-            } else {
-                showToast('Error deleting request', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showToast('Error deleting request', 'error');
-        });
-    }
-}
