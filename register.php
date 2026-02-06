@@ -77,7 +77,7 @@
     <div class="mt-6 text-center">
       <p class="text-gray-600 text-sm">
         Already have an account? 
-        <a href="http://localhost/caplog1" class="text-indigo-600 hover:underline">Login</a>
+        <a href="https://log1.imarketph.com" class="text-indigo-600 hover:underline">Login</a>
       </p>
     </div>
   </div>
@@ -141,7 +141,7 @@
       registerSpinner.classList.remove('hidden');
 
       try {
-        const response = await fetch('http://localhost/caplog1/api/users.php', {
+        const response = await fetch('https://log1.imarketph.com/api/users.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, email, password })
@@ -151,7 +151,7 @@
 
         if (data.message && data.message.toLowerCase().includes('success')) {
           showToast(data.message, "success");
-          setTimeout(() => window.location.href = 'http://localhost/caplog1', 2000);
+          setTimeout(() => window.location.href = 'https://log1.imarketph.com', 2000);
         } else {
           showToast(data.message || "Registration failed", "error");
         }

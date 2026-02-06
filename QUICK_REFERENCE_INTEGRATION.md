@@ -7,7 +7,7 @@ The Vendor Portal is now a **fully independent page** with its own branding, nav
 
 **Access it here:**
 ```
-http://localhost/caplog1/pages/vendor_portal.php
+https://log1.imarketph.com/pages/vendor_portal.php
 ```
 
 **Features:**
@@ -24,7 +24,7 @@ The Create Contract & Reports page now **pulls vendor data from the Vendor Porta
 
 **Access it here:**
 ```
-http://localhost/caplog1/pages/create_contract_reports.php
+https://log1.imarketph.com/pages/create_contract_reports.php
 ```
 
 **What's Different:**

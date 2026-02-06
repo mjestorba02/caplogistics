@@ -45,7 +45,7 @@ OPTION B: Using MySQL Command Line
 
 OPTION C: Automatic (Using PHP)
 -------
-1. Visit: http://localhost/caplog1/setup_supplier_table.php
+1. Visit: https://log1.imarketph.com/setup_supplier_table.php
 2. It will create the table automatically
 3. Response will show success or error
 
@@ -75,24 +75,24 @@ API ENDPOINTS:
 ================================================================================
 
 1. GET - Retrieve all suppliers
-   URL: http://localhost/caplog1/api/supplier_identification.php
+   URL: https://log1.imarketph.com/api/supplier_identification.php
    Method: GET
    Response: { "status": "success", "suppliers": [...] }
 
 2. POST - Add new supplier
-   URL: http://localhost/caplog1/api/supplier_identification.php
+   URL: https://log1.imarketph.com/api/supplier_identification.php
    Method: POST
    Data: { supplier_name, contact_email, certifications[], risk_level, phone, notes }
    Response: { "status": "success", "message": "Supplier added successfully" }
 
 3. PUT - Update supplier
-   URL: http://localhost/caplog1/api/supplier_identification.php
+   URL: https://log1.imarketph.com/api/supplier_identification.php
    Method: PUT
    Data: { id, supplier_name, contact_email, certifications[], risk_level, phone, notes }
    Response: { "status": "success", "message": "Supplier updated successfully" }
 
 4. DELETE - Delete supplier
-   URL: http://localhost/caplog1/api/supplier_identification.php
+   URL: https://log1.imarketph.com/api/supplier_identification.php
    Method: DELETE
    Data: { id }
    Response: { "status": "success", "message": "Supplier deleted successfully" }
@@ -113,7 +113,7 @@ A: Check browser console (F12 > Console) for error message
    - Database connection error
 
 Q: How do I test if it's working?
-A: Open http://localhost/caplog1/pages/supplier_identification.php
+A: Open https://log1.imarketph.com/pages/supplier_identification.php
    Click "Add Supplier" and fill in the form
    If it saves successfully, the fix is working!
 

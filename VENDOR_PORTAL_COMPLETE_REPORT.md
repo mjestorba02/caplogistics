@@ -355,7 +355,7 @@ scripts/vendor_portal.js
 
 ### Phase 2: Testing (10 minutes)
 ```
-1. Navigate to: http://localhost/caplog1/pages/vendor_portal.php
+1. Navigate to: https://log1.imarketph.com/pages/vendor_portal.php
 2. Register a test vendor
 3. Test each tab (Validation, Verification, Requirements)
 4. Verify search and filters work

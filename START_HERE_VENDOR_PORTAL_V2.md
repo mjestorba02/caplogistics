@@ -16,7 +16,7 @@ The Vendor Portal has been completely redesigned to work as a standalone page:
 - ✅ Complete CRUD operations maintained
 - ✅ Professional user menu with logout
 
-**Access:** `http://localhost/caplog1/pages/vendor_portal.php`
+**Access:** `https://log1.imarketph.com/pages/vendor_portal.php`
 
 ---
 
@@ -32,7 +32,7 @@ The Contract Reports system is now fully integrated with the Vendor Portal:
 - ✅ Backward compatible with existing contracts
 - ✅ Full audit trail support
 
-**Access:** `http://localhost/caplog1/pages/create_contract_reports.php`
+**Access:** `https://log1.imarketph.com/pages/create_contract_reports.php`
 
 ---
 

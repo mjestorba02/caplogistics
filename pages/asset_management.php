@@ -50,7 +50,6 @@ $children = <<<'HTML'
                     <th class="px-6 py-3">Item Name</th>
                     <th class="px-6 py-3">Quality</th>
                     <th class="px-6 py-3">Status</th>
-                    <th class="px-6 py-3">Maintenance</th>
                     <th class="px-6 py-3">Date</th>
                     <th class="px-6 py-3">Actions</th>
                 </tr>
@@ -198,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="text-xs text-gray-600">${a.quality_percent}%</span>
                 </td>
                 <td class="px-6 py-3"><span class="px-2 py-1 rounded text-xs font-semibold ${a.status === 'Active' ? 'bg-green-100 text-green-800' : a.status === 'Inactive' ? 'bg-gray-100 text-gray-800' : a.status === 'Maintenance' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}">${a.status}</span></td>
-                <td class="px-6 py-3"><a href="asset_maintenance.php" class="text-indigo-600 hover:text-indigo-900 font-semibold text-xs">View Maintenance</a></td>
+                <!-- <td class="px-6 py-3"><a href="asset_maintenance.php" class="text-indigo-600 hover:text-indigo-900 font-semibold text-xs">View Maintenance</a></td> -->
                 <td class="px-6 py-3 text-sm">${new Date(a.date).toLocaleDateString()}</td>
                 <td class="px-6 py-3 flex gap-1">
                     <button onclick='editAsset(${JSON.stringify(a).replace(/"/g, '&quot;')})' class="bg-indigo-600 text-white px-2 py-1 rounded text-xs hover:bg-indigo-700" title="Edit">

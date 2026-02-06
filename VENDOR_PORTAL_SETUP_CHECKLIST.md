@@ -49,7 +49,7 @@ Check all files are in correct locations:
 
 **Method 1: Direct URL**
 ```
-http://localhost/caplog1/pages/vendor_portal.php
+https://log1.imarketph.com/pages/vendor_portal.php
 ```
 
 **Method 2: Via Dashboard Navigation**
