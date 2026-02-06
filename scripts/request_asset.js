@@ -2,8 +2,6 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize
-    loadMyRequests();
-    loadStatusCounts();
     attachEventListeners();
 });
 
@@ -12,14 +10,6 @@ document.addEventListener('DOMContentLoaded', function() {
 // ============================================================================
 
 function attachEventListeners() {
-    // Tab navigation
-    document.querySelectorAll('.tab-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const tabName = this.getAttribute('data-tab');
-            switchTab(tabName);
-        });
-    });
-
     // Form submission
     document.getElementById('requestAssetForm').addEventListener('submit', submitRequest);
 
@@ -35,45 +25,6 @@ function attachEventListeners() {
             updateItemNumbers();
         }
     });
-
-    // Filter listeners
-    document.getElementById('searchFilter').addEventListener('input', filterRequests);
-    document.getElementById('statusFilter').addEventListener('change', filterRequests);
-    document.getElementById('priorityFilter').addEventListener('change', filterRequests);
-}
-
-// ============================================================================
-// TAB SWITCHING
-// ============================================================================
-
-function switchTab(tabName) {
-    // Hide all tabs
-    document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.classList.add('hidden');
-    });
-
-    // Remove active state from all buttons
-    document.querySelectorAll('.tab-button').forEach(btn => {
-        btn.classList.remove('active');
-        btn.classList.remove('border-indigo-600', 'text-indigo-600');
-        btn.classList.add('border-transparent', 'text-gray-600');
-    });
-
-    // Show selected tab
-    document.getElementById(tabName).classList.remove('hidden');
-
-    // Mark button as active
-    const activeButton = document.querySelector(`[data-tab="${tabName}"]`);
-    activeButton.classList.add('active');
-    activeButton.classList.remove('border-transparent', 'text-gray-600');
-    activeButton.classList.add('border-indigo-600', 'text-indigo-600');
-
-    // Reload data based on tab
-    if (tabName === 'view-tab') {
-        loadMyRequests();
-    } else if (tabName === 'status-tab') {
-        loadStatusCounts();
-    }
 }
 
 // ============================================================================
@@ -190,6 +141,31 @@ function submitRequest(e) {
     .then(data => {
         if (data.status === 'success') {
             showToast('Request submitted successfully! Request ID: ' + data.request_id, 'success');
+            
+            // Also submit to request_supplies for procurement workflow
+            const supplyPayload = {
+                items: items,
+                priority: priority,
+                requester_id: data.requester_id,
+                requester_name: data.requester_name,
+                asset_request_id: data.request_id,
+                notes: notes
+            };
+            
+            fetch('../api/request_supplies.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(supplyPayload)
+            })
+            .then(response => response.json())
+            .then(supplyData => {
+                if (supplyData.status === 'success') {
+                    showToast('Request forwarded to Procurement', 'success');
+                }
+            })
+            .catch(error => console.error('Supply submission error:', error));
+            
+            // Reset form
             form.reset();
             document.getElementById('itemsContainer').innerHTML = `
                 <div class="item-row border border-gray-200 p-4 rounded-lg bg-white">
@@ -203,11 +179,6 @@ function submitRequest(e) {
                 </div>
             `;
             updateItemNumbers();
-            // Load requests in view tab
-            setTimeout(() => {
-                switchTab('view-tab');
-                loadMyRequests();
-            }, 1000);
         } else {
             showToast(data.message || 'Error submitting request', 'error');
         }
@@ -219,159 +190,8 @@ function submitRequest(e) {
 }
 
 // ============================================================================
-// LOAD AND DISPLAY REQUESTS
-// ============================================================================
-
-function loadMyRequests() {
-    fetch('../api/asset_requests.php?action=my_requests')
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                displayMyRequests(data.requests);
-            } else {
-                showToast('Error loading requests', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showToast('Error loading requests', 'error');
-        });
-}
-
-function displayMyRequests(requests) {
-    const tbody = document.getElementById('requestsTableBody');
-    
-    if (requests.length === 0) {
-        tbody.innerHTML = `
-            <tr class="border-b border-gray-200">
-                <td colspan="6" class="px-6 py-8 text-center text-gray-500">
-                    <i class='bx bx-inbox text-4xl mb-2'></i>
-                    <p>No requests found</p>
-                </td>
-            </tr>
-        `;
-        return;
-    }
-
-    tbody.innerHTML = requests.map(req => `
-        <tr class="border-b border-gray-200 hover:bg-gray-50">
-            <td class="px-6 py-4 font-semibold text-blue-600">${req.request_id}</td>
-            <td class="px-6 py-4 text-sm">${req.total_items} item(s)</td>
-            <td class="px-6 py-4">
-                <span class="px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(req.status)}">
-                    ${req.status}
-                </span>
-            </td>
-            <td class="px-6 py-4">
-                <span class="px-3 py-1 rounded-full text-xs font-semibold ${getPriorityBadgeClass(req.priority)}">
-                    ${req.priority}
-                </span>
-            </td>
-            <td class="px-6 py-4 text-sm text-gray-600">${formatDate(req.request_date)}</td>
-            <td class="px-6 py-4">
-                <button onclick="viewRequestDetails(${req.id})" class="text-blue-600 hover:text-blue-800 font-semibold mr-2">
-                    <i class='bx bx-show'></i>
-                </button>
-                ${req.status === 'Pending Approval' ? `
-                    <button onclick="editRequest(${req.id})" class="text-green-600 hover:text-green-800 mr-2">
-                        <i class='bx bx-edit'></i>
-                    </button>
-                    <button onclick="deleteRequest(${req.id})" class="text-red-600 hover:text-red-800">
-                        <i class='bx bx-trash'></i>
-                    </button>
-                ` : ''}
-            </td>
-        </tr>
-    `).join('');
-}
-
-function filterRequests() {
-    const searchText = document.getElementById('searchFilter').value.toLowerCase();
-    const statusFilter = document.getElementById('statusFilter').value;
-    const priorityFilter = document.getElementById('priorityFilter').value;
-
-    const rows = document.querySelectorAll('#requestsTableBody tr');
-    rows.forEach(row => {
-        if (row.cells.length < 6) return; // Skip empty rows
-
-        const requestId = row.cells[0].textContent.toLowerCase();
-        const status = row.cells[2].textContent.trim();
-        const priority = row.cells[3].textContent.trim();
-
-        const matchesSearch = requestId.includes(searchText);
-        const matchesStatus = !statusFilter || status.includes(statusFilter);
-        const matchesPriority = !priorityFilter || priority.includes(priorityFilter);
-
-        row.style.display = matchesSearch && matchesStatus && matchesPriority ? '' : 'none';
-    });
-}
-
-// ============================================================================
-// STATUS TRACKING
-// ============================================================================
-
-function loadStatusCounts() {
-    fetch('../api/asset_requests.php?action=status_summary')
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                displayStatusCounts(data);
-            }
-        })
-        .catch(error => console.error('Error:', error));
-}
-
-function displayStatusCounts(data) {
-    document.getElementById('countPending').textContent = data.pending_count || 0;
-    document.getElementById('countApproved').textContent = data.approved_count || 0;
-    document.getElementById('countInProcess').textContent = data.in_process_count || 0;
-    document.getElementById('countRejected').textContent = data.rejected_count || 0;
-
-    // Build timeline
-    const timeline = document.getElementById('statusTimeline');
-    if (data.recent_requests && data.recent_requests.length > 0) {
-        timeline.innerHTML = data.recent_requests.map(req => `
-            <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h4 class="font-semibold text-gray-800">${req.request_id}</h4>
-                        <p class="text-sm text-gray-600 mt-1">${req.total_items} asset(s) requested</p>
-                    </div>
-                    <span class="px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadgeClass(req.status)}">
-                        ${req.status}
-                    </span>
-                </div>
-                <p class="text-xs text-gray-500 mt-3">Requested on ${formatDate(req.request_date)}</p>
-            </div>
-        `).join('');
-    } else {
-        timeline.innerHTML = '<p class="text-gray-500">No requests yet</p>';
-    }
-}
-
-// ============================================================================
 // UTILITY FUNCTIONS
 // ============================================================================
-
-function getStatusBadgeClass(status) {
-    switch(status) {
-        case 'Pending Approval': return 'bg-yellow-100 text-yellow-800';
-        case 'Approved': return 'bg-green-100 text-green-800';
-        case 'In Process': return 'bg-blue-100 text-blue-800';
-        case 'Rejected': return 'bg-red-100 text-red-800';
-        case 'Completed': return 'bg-purple-100 text-purple-800';
-        default: return 'bg-gray-100 text-gray-800';
-    }
-}
-
-function getPriorityBadgeClass(priority) {
-    switch(priority) {
-        case 'High': return 'bg-red-100 text-red-800';
-        case 'Medium': return 'bg-yellow-100 text-yellow-800';
-        case 'Low': return 'bg-green-100 text-green-800';
-        default: return 'bg-gray-100 text-gray-800';
-    }
-}
 
 function formatDate(dateString) {
     const date = new Date(dateString);
@@ -393,21 +213,6 @@ function showToast(message, type = 'info') {
         alert(message);
     }
 }
-
-function viewRequestDetails(requestId) {
-    // Open detailed view modal
-    alert('View details for request ID: ' + requestId);
-    // TODO: Implement modal with request details
-}
-
-function editRequest(requestId) {
-    alert('Edit request ID: ' + requestId);
-    // TODO: Implement edit functionality
-}
-
-function deleteRequest(requestId) {
-    if (confirm('Are you sure you want to delete this request?')) {
-        fetch('../api/asset_requests.php', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: requestId })
