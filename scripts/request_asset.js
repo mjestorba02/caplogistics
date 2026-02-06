@@ -55,8 +55,8 @@ function switchTab(tabName) {
     // Remove active state from all buttons
     document.querySelectorAll('.tab-button').forEach(btn => {
         btn.classList.remove('active');
-        btn.style.borderBottomColor = 'transparent';
-        btn.style.color = '#4B5563';
+        btn.classList.remove('border-indigo-600', 'text-indigo-600');
+        btn.classList.add('border-transparent', 'text-gray-600');
     });
 
     // Show selected tab
@@ -65,8 +65,8 @@ function switchTab(tabName) {
     // Mark button as active
     const activeButton = document.querySelector(`[data-tab="${tabName}"]`);
     activeButton.classList.add('active');
-    activeButton.style.borderBottomColor = '#2563EB';
-    activeButton.style.color = '#2563EB';
+    activeButton.classList.remove('border-transparent', 'text-gray-600');
+    activeButton.classList.add('border-indigo-600', 'text-indigo-600');
 
     // Reload data based on tab
     if (tabName === 'view-tab') {
@@ -85,7 +85,7 @@ function addItemRow() {
     const itemCount = itemsContainer.querySelectorAll('.item-row').length + 1;
 
     const newItemRow = document.createElement('div');
-    newItemRow.className = 'item-row border border-gray-200 p-4 rounded-lg bg-gray-50';
+    newItemRow.className = 'item-row border border-gray-200 p-4 rounded-lg bg-white';
     newItemRow.innerHTML = `
         <div class="flex justify-between items-center mb-4">
             <span class="text-sm font-semibold text-gray-700">Item #${itemCount}</span>
@@ -97,17 +97,17 @@ function addItemRow() {
         <div class="space-y-3">
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Asset Description *</label>
-                <input type="text" class="asset-description w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Laptop, Office Chair, Software License" required>
+                <input type="text" class="asset-description w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g., Laptop, Office Chair, Software License" required>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Quantity *</label>
-                    <input type="number" class="quantity w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" min="1" value="1" required>
+                    <input type="number" class="quantity w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" min="1" value="1" required>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Urgency *</label>
-                    <select class="urgency w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <select class="urgency w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
                         <option value="Low">Low</option>
                         <option value="Medium" selected>Medium</option>
                         <option value="High">High</option>
@@ -117,12 +117,12 @@ function addItemRow() {
 
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Estimated Cost (Optional)</label>
-                <input type="number" class="estimated-cost w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" step="0.01" min="0" placeholder="0.00">
+                <input type="number" class="estimated-cost w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" step="0.01" min="0" placeholder="0.00">
             </div>
 
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Item Notes (Optional)</label>
-                <input type="text" class="item-notes w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Specific requirements for this item...">
+                <input type="text" class="item-notes w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Specific requirements for this item...">
             </div>
         </div>
     `;
@@ -192,7 +192,7 @@ function submitRequest(e) {
             showToast('Request submitted successfully! Request ID: ' + data.request_id, 'success');
             form.reset();
             document.getElementById('itemsContainer').innerHTML = `
-                <div class="item-row border border-gray-200 p-4 rounded-lg bg-gray-50">
+                <div class="item-row border border-gray-200 p-4 rounded-lg bg-white">
                     <div class="flex justify-between items-center mb-4">
                         <span class="text-sm font-semibold text-gray-700">Item #1</span>
                         <button type="button" class="remove-item text-red-500 hover:text-red-700 hidden">
