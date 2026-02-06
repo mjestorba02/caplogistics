@@ -23,51 +23,31 @@ function json_response($data, int $code = 200) {
 }
 
 try {
-    // Ensure table exists
-    $conn->exec("CREATE TABLE IF NOT EXISTS asset_maintenance (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        asset_id INT NOT NULL,
-        item_number VARCHAR(100) NOT NULL,
-        maintenance_type ENUM('Preventive', 'Corrective', 'Emergency') DEFAULT 'Preventive',
-        description TEXT NOT NULL,
-        scheduled_date DATE,
-        completed_date DATE,
-        technician_name VARCHAR(255),
-        status ENUM('Pending', 'In Progress', 'Completed', 'Cancelled') DEFAULT 'Pending',
-        cost DECIMAL(12, 2),
-        notes TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        created_by INT,
-        INDEX idx_asset_id (asset_id),
-        INDEX idx_item_number (item_number),
-        INDEX idx_status (status),
-        INDEX idx_scheduled_date (scheduled_date)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-
     switch ($method) {
         case 'GET':
             $action = $_GET['action'] ?? '';
             
             if ($action === 'all') {
                 // Get all maintenance records
-                $sql = "SELECT * FROM asset_maintenance ORDER BY scheduled_date DESC";
+                $sql = "SELECT * FROM asset_maintenance ORDER BY maintenance_date DESC, created_at DESC";
                 $stmt = $conn->query($sql);
-                json_response(['status' => 'success', 'records' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+                $records = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+                json_response(['status' => 'success', 'records' => $records]);
                 
             } elseif ($action === 'by_asset') {
                 // Get maintenance records for specific asset
-                $asset_id = $_GET['asset_id'] ?? 0;
+                $asset_id = $_GET['asset_id'] ?? '';
                 $sql = "SELECT * FROM asset_maintenance WHERE asset_id = ? ORDER BY created_at DESC";
                 $stmt = $conn->prepare($sql);
                 $stmt->execute([$asset_id]);
                 json_response(['status' => 'success', 'records' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
                 
             } elseif ($action === 'pending') {
-                // Get pending maintenance
-                $sql = "SELECT * FROM asset_maintenance WHERE status IN ('Pending', 'In Progress') ORDER BY scheduled_date ASC";
+                // Get pending/scheduled maintenance
+                $sql = "SELECT * FROM asset_maintenance WHERE status IN ('Scheduled', 'Completed') ORDER BY maintenance_date ASC";
                 $stmt = $conn->query($sql);
-                json_response(['status' => 'success', 'records' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+                $records = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+                json_response(['status' => 'success', 'records' => $records]);
                 
             } else {
                 json_response(['status' => 'error', 'message' => 'Invalid action'], 400);
@@ -75,52 +55,36 @@ try {
             break;
 
         case 'POST':
-            $asset_id = $input['asset_id'] ?? 0;
-            $item_number = $input['item_number'] ?? '';
+            $asset_id = $input['asset_id'] ?? '';
+            $asset_name = $input['asset_name'] ?? '';
             $maintenance_type = $input['maintenance_type'] ?? 'Preventive';
-            $description = $input['description'] ?? '';
-            $scheduled_date = $input['scheduled_date'] ?? null;
-            $technician_name = $input['technician_name'] ?? '';
-            $cost = floatval($input['cost'] ?? 0);
+            $maintenance_date = $input['maintenance_date'] ?? date('Y-m-d');
             $notes = $input['notes'] ?? '';
 
-            if ($asset_id <= 0 || empty($description)) {
-                json_response(['status' => 'error', 'message' => 'Asset ID and description are required'], 400);
+            if (empty($asset_id) || empty($asset_name)) {
+                json_response(['status' => 'error', 'message' => 'Asset ID and Asset Name are required'], 400);
             }
 
-            $sql = "INSERT INTO asset_maintenance (asset_id, item_number, maintenance_type, description, scheduled_date, technician_name, cost, notes, created_by, status) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')";
+            $sql = "INSERT INTO asset_maintenance (asset_id, asset_name, type, maintenance_date, notes, status) 
+                    VALUES (?, ?, ?, ?, ?, 'Scheduled')";
             $stmt = $conn->prepare($sql);
-            $stmt->execute([$asset_id, $item_number, $maintenance_type, $description, $scheduled_date, $technician_name, $cost, $notes, $_SESSION['id']]);
+            $stmt->execute([$asset_id, $asset_name, $maintenance_type, $maintenance_date, $notes]);
 
             json_response(['status' => 'success', 'message' => 'Maintenance record created', 'id' => $conn->lastInsertId()]);
             break;
 
         case 'PUT':
             $id = $input['id'] ?? 0;
-            $status = $input['status'] ?? '';
-            $completed_date = $input['completed_date'] ?? null;
-            $technician_name = $input['technician_name'] ?? '';
+            $status = $input['status'] ?? 'Scheduled';
             $notes = $input['notes'] ?? '';
-            $cost = isset($input['cost']) ? floatval($input['cost']) : null;
 
             if ($id <= 0) {
                 json_response(['status' => 'error', 'message' => 'ID is required'], 400);
             }
 
-            $sql = "UPDATE asset_maintenance SET status = ?, completed_date = ?, technician_name = ?, notes = ?";
-            $params = [$status, $completed_date, $technician_name, $notes];
-            
-            if ($cost !== null) {
-                $sql .= ", cost = ?";
-                $params[] = $cost;
-            }
-            
-            $sql .= " WHERE id = ?";
-            $params[] = $id;
-
+            $sql = "UPDATE asset_maintenance SET status = ?, notes = ? WHERE id = ?";
             $stmt = $conn->prepare($sql);
-            $stmt->execute($params);
+            $stmt->execute([$status, $notes, $id]);
 
             json_response(['status' => 'success', 'message' => 'Maintenance record updated']);
             break;
@@ -145,9 +109,9 @@ try {
 
 } catch (PDOException $e) {
     error_log('Maintenance API Error: ' . $e->getMessage());
-    json_response(['status' => 'error', 'message' => 'Database error'], 500);
+    json_response(['status' => 'error', 'message' => 'Database error: ' . $e->getMessage()], 500);
 } catch (Exception $e) {
     error_log('Maintenance API Error: ' . $e->getMessage());
-    json_response(['status' => 'error', 'message' => 'Server error'], 500);
+    json_response(['status' => 'error', 'message' => 'Server error: ' . $e->getMessage()], 500);
 }
 ?>

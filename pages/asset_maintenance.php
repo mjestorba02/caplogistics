@@ -23,17 +23,17 @@ ob_start();
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <select id="filterStatus" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600">
             <option value="">All Status</option>
-            <option value="Pending">Pending</option>
-            <option value="In Progress">In Progress</option>
+            <option value="Scheduled">Scheduled</option>
             <option value="Completed">Completed</option>
             <option value="Cancelled">Cancelled</option>
+            <option value="Archived">Archived</option>
         </select>
 
         <select id="filterType" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600">
             <option value="">All Types</option>
             <option value="Preventive">Preventive</option>
             <option value="Corrective">Corrective</option>
-            <option value="Emergency">Emergency</option>
+            <option value="Predictive">Predictive</option>
         </select>
 
         <input type="date" id="filterDate" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600" placeholder="Filter by date">
@@ -49,12 +49,11 @@ ob_start();
             <thead class="bg-gray-50 border-b border-gray-200">
                 <tr>
                     <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Asset ID</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Item Number</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Asset Name</th>
                     <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Type</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Scheduled Date</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Maintenance Date</th>
                     <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Technician</th>
-                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Cost</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Notes</th>
                     <th class="px-6 py-3 text-center text-sm font-semibold text-gray-700">Actions</th>
                 </tr>
             </thead>
@@ -78,12 +77,12 @@ ob_start();
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Asset ID *</label>
-                    <input type="number" id="assetId" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600" required>
+                    <input type="text" id="assetId" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600" required>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Item Number</label>
-                    <input type="text" id="itemNumber" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Asset Name *</label>
+                    <input type="text" id="assetName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600" required>
                 </div>
 
                 <div>
@@ -91,34 +90,19 @@ ob_start();
                     <select id="maintenanceType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600" required>
                         <option value="Preventive">Preventive</option>
                         <option value="Corrective">Corrective</option>
-                        <option value="Emergency">Emergency</option>
+                        <option value="Predictive">Predictive</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Scheduled Date</label>
-                    <input type="date" id="scheduledDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Maintenance Date</label>
+                    <input type="date" id="maintenanceDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600">
                 </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Technician Name</label>
-                    <input type="text" id="technicianName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Cost</label>
-                    <input type="number" id="cost" step="0.01" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600">
-                </div>
-            </div>
-
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Description *</label>
-                <textarea id="description" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600" required></textarea>
             </div>
 
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Notes</label>
-                <textarea id="notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"></textarea>
+                <textarea id="notes" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"></textarea>
             </div>
         </div>
 
@@ -140,26 +124,11 @@ ob_start();
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Status *</label>
                 <select id="updateStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600" required>
-                    <option value="Pending">Pending</option>
-                    <option value="In Progress">In Progress</option>
+                    <option value="Scheduled">Scheduled</option>
                     <option value="Completed">Completed</option>
                     <option value="Cancelled">Cancelled</option>
+                    <option value="Archived">Archived</option>
                 </select>
-            </div>
-
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Completed Date</label>
-                <input type="date" id="completedDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600">
-            </div>
-
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Technician Name</label>
-                <input type="text" id="updateTechnicianName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600">
-            </div>
-
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Cost</label>
-                <input type="number" id="updateCost" step="0.01" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600">
             </div>
 
             <div>
@@ -205,18 +174,15 @@ function initializeEventListeners() {
     if (submitBtn) {
         submitBtn.addEventListener('click', () => {
             const data = {
-                asset_id: parseInt(document.getElementById('assetId').value),
-                item_number: document.getElementById('itemNumber').value,
+                asset_id: document.getElementById('assetId').value,
+                asset_name: document.getElementById('assetName').value,
                 maintenance_type: document.getElementById('maintenanceType').value,
-                description: document.getElementById('description').value,
-                scheduled_date: document.getElementById('scheduledDate').value || null,
-                technician_name: document.getElementById('technicianName').value,
-                cost: parseFloat(document.getElementById('cost').value) || 0,
+                maintenance_date: document.getElementById('maintenanceDate').value || new Date().toISOString().split('T')[0],
                 notes: document.getElementById('notes').value
             };
 
-            if (!data.asset_id || !data.description) {
-                alert('Asset ID and Description are required');
+            if (!data.asset_id || !data.asset_name) {
+                alert('Asset ID and Asset Name are required');
                 return;
             }
 
@@ -232,8 +198,7 @@ function initializeEventListeners() {
                     showToast('Maintenance scheduled successfully', 'success');
                     document.getElementById('scheduleMaintenanceModal').classList.add('hidden');
                     document.getElementById('assetId').value = '';
-                    document.getElementById('itemNumber').value = '';
-                    document.getElementById('description').value = '';
+                    document.getElementById('assetName').value = '';
                     document.getElementById('notes').value = '';
                     loadMaintenanceRecords();
                 } else {
@@ -254,9 +219,6 @@ function initializeEventListeners() {
             const data = {
                 id: currentEditingId,
                 status: document.getElementById('updateStatus').value,
-                completed_date: document.getElementById('completedDate').value || null,
-                technician_name: document.getElementById('updateTechnicianName').value,
-                cost: parseFloat(document.getElementById('updateCost').value) || null,
                 notes: document.getElementById('updateNotes').value
             };
 
@@ -323,36 +285,35 @@ function displayRecords(records) {
     const tbody = document.getElementById('maintenanceTableBody');
     
     if (records.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-4 text-center text-gray-500">No maintenance records found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">No maintenance records found.</td></tr>';
         return;
     }
 
     tbody.innerHTML = records.map(record => `
         <tr class="hover:bg-gray-50">
             <td class="px-6 py-4 text-sm text-gray-900">${record.asset_id}</td>
-            <td class="px-6 py-4 text-sm text-gray-900">${record.item_number || '-'}</td>
+            <td class="px-6 py-4 text-sm text-gray-900">${record.asset_name || '-'}</td>
             <td class="px-6 py-4 text-sm">
                 <span class="px-2 py-1 rounded-full text-xs font-semibold ${
-                    record.maintenance_type === 'Emergency' ? 'bg-red-100 text-red-800' :
-                    record.maintenance_type === 'Corrective' ? 'bg-yellow-100 text-yellow-800' :
+                    record.type === 'Corrective' ? 'bg-yellow-100 text-yellow-800' :
+                    record.type === 'Predictive' ? 'bg-purple-100 text-purple-800' :
                     'bg-blue-100 text-blue-800'
                 }">
-                    ${record.maintenance_type}
+                    ${record.type}
                 </span>
             </td>
-            <td class="px-6 py-4 text-sm text-gray-900">${record.scheduled_date || '-'}</td>
+            <td class="px-6 py-4 text-sm text-gray-900">${record.maintenance_date || '-'}</td>
             <td class="px-6 py-4 text-sm">
                 <span class="px-2 py-1 rounded-full text-xs font-semibold ${
                     record.status === 'Completed' ? 'bg-green-100 text-green-800' :
-                    record.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
                     record.status === 'Cancelled' ? 'bg-gray-100 text-gray-800' :
+                    record.status === 'Archived' ? 'bg-slate-100 text-slate-800' :
                     'bg-yellow-100 text-yellow-800'
                 }">
                     ${record.status}
                 </span>
             </td>
-            <td class="px-6 py-4 text-sm text-gray-900">${record.technician_name || '-'}</td>
-            <td class="px-6 py-4 text-sm text-gray-900">${record.cost ? '$' + parseFloat(record.cost).toFixed(2) : '-'}</td>
+            <td class="px-6 py-4 text-sm text-gray-900">${record.notes ? record.notes.substring(0, 30) + '...' : '-'}</td>
             <td class="px-6 py-4 text-center text-sm">
                 <button class="editBtn text-indigo-600 hover:text-indigo-900 font-semibold" data-id="${record.id}">Edit</button>
                 <button class="deleteBtn text-red-600 hover:text-red-900 font-semibold ml-3" data-id="${record.id}">Delete</button>
@@ -376,10 +337,7 @@ function openEditModal(id) {
     if (!record) return;
 
     currentEditingId = id;
-    document.getElementById('updateStatus').value = record.status;
-    document.getElementById('completedDate').value = record.completed_date || '';
-    document.getElementById('updateTechnicianName').value = record.technician_name || '';
-    document.getElementById('updateCost').value = record.cost || '';
+    document.getElementById('updateStatus').value = record.status || 'Scheduled';
     document.getElementById('updateNotes').value = record.notes || '';
 
     document.getElementById('updateStatusModal').classList.remove('hidden');
