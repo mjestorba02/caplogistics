@@ -184,6 +184,125 @@ require_once __DIR__ . '/../layout/adminLayout.php';
 let currentEditingId = null;
 let allRecords = [];
 
+function initializeEventListeners() {
+    // Open schedule modal
+    const scheduleBtn = document.getElementById('scheduleMaintenanceBtn');
+    if (scheduleBtn) {
+        scheduleBtn.addEventListener('click', () => {
+            document.getElementById('scheduleMaintenanceModal').classList.remove('hidden');
+        });
+    }
+
+    // Close modals
+    document.querySelectorAll('.closeModal').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.closest('.fixed').classList.add('hidden');
+        });
+    });
+
+    // Submit maintenance
+    const submitBtn = document.getElementById('submitMaintenanceBtn');
+    if (submitBtn) {
+        submitBtn.addEventListener('click', () => {
+            const data = {
+                asset_id: parseInt(document.getElementById('assetId').value),
+                item_number: document.getElementById('itemNumber').value,
+                maintenance_type: document.getElementById('maintenanceType').value,
+                description: document.getElementById('description').value,
+                scheduled_date: document.getElementById('scheduledDate').value || null,
+                technician_name: document.getElementById('technicianName').value,
+                cost: parseFloat(document.getElementById('cost').value) || 0,
+                notes: document.getElementById('notes').value
+            };
+
+            if (!data.asset_id || !data.description) {
+                alert('Asset ID and Description are required');
+                return;
+            }
+
+            fetch('/newcaplog1/api/asset_maintenance.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showToast('Maintenance scheduled successfully', 'success');
+                    document.getElementById('scheduleMaintenanceModal').classList.add('hidden');
+                    document.getElementById('assetId').value = '';
+                    document.getElementById('itemNumber').value = '';
+                    document.getElementById('description').value = '';
+                    document.getElementById('notes').value = '';
+                    loadMaintenanceRecords();
+                } else {
+                    showToast(data.message || 'Error scheduling maintenance', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error scheduling maintenance', 'error');
+            });
+        });
+    }
+
+    // Update status
+    const updateStatusBtn = document.getElementById('updateStatusBtn');
+    if (updateStatusBtn) {
+        updateStatusBtn.addEventListener('click', () => {
+            const data = {
+                id: currentEditingId,
+                status: document.getElementById('updateStatus').value,
+                completed_date: document.getElementById('completedDate').value || null,
+                technician_name: document.getElementById('updateTechnicianName').value,
+                cost: parseFloat(document.getElementById('updateCost').value) || null,
+                notes: document.getElementById('updateNotes').value
+            };
+
+            fetch('/newcaplog1/api/asset_maintenance.php', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showToast('Maintenance record updated', 'success');
+                    document.getElementById('updateStatusModal').classList.add('hidden');
+                    loadMaintenanceRecords();
+                } else {
+                    showToast(data.message || 'Error updating record', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error updating record', 'error');
+            });
+        });
+    }
+
+    // Filter records
+    const filterStatus = document.getElementById('filterStatus');
+    const filterType = document.getElementById('filterType');
+    const filterDate = document.getElementById('filterDate');
+    const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+
+    if (filterStatus) filterStatus.addEventListener('change', applyFilters);
+    if (filterType) filterType.addEventListener('change', applyFilters);
+    if (filterDate) filterDate.addEventListener('change', applyFilters);
+    
+    if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', () => {
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterType').value = '';
+            document.getElementById('filterDate').value = '';
+            displayRecords(allRecords);
+        });
+    }
+}
+
 // Load maintenance records
 function loadMaintenanceRecords() {
     fetch('/newcaplog1/api/asset_maintenance.php?action=all', {
@@ -252,62 +371,6 @@ function displayRecords(records) {
 }
 
 // Open schedule modal
-document.getElementById('scheduleMaintenanceBtn').addEventListener('click', () => {
-    document.getElementById('scheduleMaintenanceModal').classList.remove('hidden');
-});
-
-// Close modals
-document.querySelectorAll('.closeModal').forEach(btn => {
-    btn.addEventListener('click', function() {
-        this.closest('.fixed').classList.add('hidden');
-    });
-});
-
-// Submit maintenance
-document.getElementById('submitMaintenanceBtn').addEventListener('click', () => {
-    const data = {
-        asset_id: parseInt(document.getElementById('assetId').value),
-        item_number: document.getElementById('itemNumber').value,
-        maintenance_type: document.getElementById('maintenanceType').value,
-        description: document.getElementById('description').value,
-        scheduled_date: document.getElementById('scheduledDate').value || null,
-        technician_name: document.getElementById('technicianName').value,
-        cost: parseFloat(document.getElementById('cost').value) || 0,
-        notes: document.getElementById('notes').value
-    };
-
-    if (!data.asset_id || !data.description) {
-        alert('Asset ID and Description are required');
-        return;
-    }
-
-    fetch('/newcaplog1/api/asset_maintenance.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            showToast('Maintenance scheduled successfully', 'success');
-            document.getElementById('scheduleMaintenanceModal').classList.add('hidden');
-            document.getElementById('assetId').value = '';
-            document.getElementById('itemNumber').value = '';
-            document.getElementById('description').value = '';
-            document.getElementById('notes').value = '';
-            loadMaintenanceRecords();
-        } else {
-            showToast(data.message || 'Error scheduling maintenance', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showToast('Error scheduling maintenance', 'error');
-    });
-});
-
-// Open edit modal
 function openEditModal(id) {
     const record = allRecords.find(r => r.id === id);
     if (!record) return;
@@ -321,39 +384,6 @@ function openEditModal(id) {
 
     document.getElementById('updateStatusModal').classList.remove('hidden');
 }
-
-// Update status
-document.getElementById('updateStatusBtn').addEventListener('click', () => {
-    const data = {
-        id: currentEditingId,
-        status: document.getElementById('updateStatus').value,
-        completed_date: document.getElementById('completedDate').value || null,
-        technician_name: document.getElementById('updateTechnicianName').value,
-        cost: parseFloat(document.getElementById('updateCost').value) || null,
-        notes: document.getElementById('updateNotes').value
-    };
-
-    fetch('/newcaplog1/api/asset_maintenance.php', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            showToast('Maintenance record updated', 'success');
-            document.getElementById('updateStatusModal').classList.add('hidden');
-            loadMaintenanceRecords();
-        } else {
-            showToast(data.message || 'Error updating record', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showToast('Error updating record', 'error');
-    });
-});
 
 // Delete record
 function deleteRecord(id) {
@@ -396,17 +426,6 @@ function applyFilters() {
     displayRecords(filtered);
 }
 
-document.getElementById('filterStatus').addEventListener('change', applyFilters);
-document.getElementById('filterType').addEventListener('change', applyFilters);
-document.getElementById('filterDate').addEventListener('change', applyFilters);
-
-document.getElementById('clearFiltersBtn').addEventListener('click', () => {
-    document.getElementById('filterStatus').value = '';
-    document.getElementById('filterType').value = '';
-    document.getElementById('filterDate').value = '';
-    displayRecords(allRecords);
-});
-
 function showToast(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white ${
@@ -420,5 +439,8 @@ function showToast(message, type = 'info') {
 }
 
 // Load records on page load
-loadMaintenanceRecords();
+document.addEventListener('DOMContentLoaded', () => {
+    initializeEventListeners();
+    loadMaintenanceRecords();
+});
 </script>
