@@ -160,10 +160,14 @@ function submitRequest(e) {
                 fetch('../api/request_supplies.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
                     body: JSON.stringify(supplyPayload)
                 })
                 .then(response => {
                     console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        console.error('HTTP Error:', response.status, response.statusText);
+                    }
                     return response.json();
                 })
                 .then(supplyData => {
@@ -172,6 +176,7 @@ function submitRequest(e) {
                         console.log('Item ' + (index + 1) + ' forwarded to Procurement');
                     } else {
                         console.error('Error forwarding item ' + (index + 1) + ':', supplyData.message);
+                        showToast('Error: ' + supplyData.message, 'error');
                     }
                 })
                 .catch(error => {
