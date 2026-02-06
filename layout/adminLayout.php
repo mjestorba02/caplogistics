@@ -78,6 +78,7 @@ function adminLayout($children) {
     'title' => 'Asset Management',
     'icon' => 'bx-cube-alt',
     'subs' => [
+      ['title' => 'Request Asset', 'link' => 'request_asset.php'],
       ['title' => 'Asset Management', 'link' => 'asset_management.php'],
     ]
   ],
