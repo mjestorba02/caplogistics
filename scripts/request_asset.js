@@ -142,28 +142,44 @@ function submitRequest(e) {
         if (data.status === 'success') {
             showToast('Request submitted successfully! Request ID: ' + data.request_id, 'success');
             
-            // Also submit to request_supplies for procurement workflow
-            const supplyPayload = {
-                items: items,
-                priority: priority,
-                requester_id: data.requester_id,
-                requester_name: data.requester_name,
-                asset_request_id: data.request_id,
-                notes: notes
-            };
+            // Submit each item to request_supplies for procurement workflow
+            console.log('Submitting ' + items.length + ' items to procurement');
+            items.forEach((item, index) => {
+                const supplyPayload = {
+                    item_name: item.asset_description,
+                    quantity: item.quantity,
+                    description: item.notes || '',
+                    urgency: item.urgency,
+                    requester_id: data.requester_id || '1',
+                    requester_name: data.requester_name || 'Unknown',
+                    request_type: 'Manual'
+                };
+                
+                console.log('Sending item ' + (index + 1) + ':', supplyPayload);
+                
+                fetch('../api/request_supplies.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(supplyPayload)
+                })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    return response.json();
+                })
+                .then(supplyData => {
+                    console.log('Supply API response:', supplyData);
+                    if (supplyData.status === 'success') {
+                        console.log('Item ' + (index + 1) + ' forwarded to Procurement');
+                    } else {
+                        console.error('Error forwarding item ' + (index + 1) + ':', supplyData.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Supply submission error for item ' + (index + 1) + ':', error);
+                });
+            });
             
-            fetch('../api/request_supplies.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(supplyPayload)
-            })
-            .then(response => response.json())
-            .then(supplyData => {
-                if (supplyData.status === 'success') {
-                    showToast('Request forwarded to Procurement', 'success');
-                }
-            })
-            .catch(error => console.error('Supply submission error:', error));
+            showToast('Request forwarded to Procurement', 'success');
             
             // Reset form
             form.reset();
