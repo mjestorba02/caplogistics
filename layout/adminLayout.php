@@ -1,5 +1,5 @@
 <?php
-function adminLayout($children) {
+function adminLayout($children, $account_type = 0) {
     $currentPage = basename($_SERVER['PHP_SELF']);
 ?>
 <!DOCTYPE html>
@@ -40,7 +40,7 @@ function adminLayout($children) {
 
 </style>
 </head>
-<body class="flex h-screen bg-gray-100">
+<body class="flex h-screen bg-gray-100" data-account-type="<?php echo htmlspecialchars($account_type); ?>">
 
 <div id="sidebar" class="sidebar fixed top-0 left-0 h-full bg-[#2c3c8c] w-64 md:w-72 transform -translate-x-full md:translate-x-0 transition-transform border-r border-gray-200 flex flex-col z-50 ">
   <div class="flex items-center justify-between p-4 border-b border-gray-200">
@@ -80,7 +80,7 @@ function adminLayout($children) {
     'subs' => [
       ['title' => 'Request Asset', 'link' => 'request_asset.php'],
       ['title' => 'Asset Management', 'link' => 'asset_management.php'],
-      // ['title' => 'Asset Maintenance', 'link' => 'asset_maintenance.php'],
+      ['title' => 'Asset Maintenance', 'link' => 'asset_maintenance.php'],
     ]
   ],
   [
@@ -114,8 +114,11 @@ function adminLayout($children) {
   ],
     ['title'=>'Admin Settings','icon'=>'bx-cog','subs'=>[
         ['title'=>'Users & Roles','link'=>'usersRoles.php'],
+        ['title'=>'Setup Departments','link'=>'setup_departments.php'],
+        ['title'=>'Verify Departments','link'=>'verify_departments.php'],
         // ['title'=>'System Configuration','link'=>'systemConfiguration.php'],
     ]],
+    ['title'=>'Archived Items','icon'=>'bx-archive','link'=>'archive.php','subs'=>[]],
   ];
 
   foreach($modules as $mod):
@@ -282,11 +285,11 @@ window.addEventListener('click', e => {
 // Logout
 async function logoutUser() {
     try {
-        const res = await fetch('https://log1.imarketph.com/api/logout.php', { method: 'POST' });
+        const res = await fetch('http://localhost/caplog1/api/logout.php', { method: 'POST' });
         const data = await res.json();
         Toastify({ text: data.message || 'Logged out', duration: 3000 }).showToast();
         if (data.status === 'success') {
-            setTimeout(() => window.location.href = 'https://log1.imarketph.com', 1000);
+            setTimeout(() => window.location.href = 'http://localhost/caplog1', 1000);
         }
     } catch (e) {
         console.error(e);

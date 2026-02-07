@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td class="px-6 py-3"><span class="px-2 py-1 rounded text-xs font-semibold ${r.inspection_status === 'Complete' ? 'bg-green-100 text-green-800' : r.inspection_status === 'In Progress' ? 'bg-yellow-100 text-yellow-800' : 'bg-orange-100 text-orange-800'}">${r.inspection_status}</span></td>
                 <td class="px-6 py-3"><span class="px-2 py-1 rounded text-xs font-semibold ${r.item_classification === 'Resellable' ? 'bg-blue-100 text-blue-800' : r.item_classification === 'Refurbish' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}">${r.item_classification}</span></td>
                 <td class="px-6 py-3"><span class="px-2 py-1 rounded text-xs font-semibold ${r.return_status === 'Refunded' || r.return_status === 'Disposed' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}">${r.return_status}</span></td>
-                <td class="px-6 py-3 flex gap-2"><button onclick='editReturn(${JSON.stringify(r).replace(/"/g, '&quot;')})' class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700">Edit</button><button onclick="deleteReturn(${r.id})" class="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700">Delete</button></td>
+                <td class="px-6 py-3 flex gap-2"><button onclick='editReturn(${JSON.stringify(r).replace(/"/g, '&quot;')})' class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700">Edit</button><button onclick="archiveReturn(${r.id})" class="bg-orange-600 text-white px-3 py-1 rounded text-xs hover:bg-orange-700">Archive</button></td>
             </tr>
         `).join('');
     }
@@ -75,18 +75,18 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal();
     }
 
-    async function deleteReturn(id) {
-        if (!confirm('Delete this return?')) return;
+    async function archiveReturn(id) {
+        if (!confirm('Archive this return?')) return;
         try {
-            const res = await fetch('../api/returns_management.php', { method: 'DELETE', body: JSON.stringify({ id }) });
+            const res = await fetch('../api/archive_management.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ archive_type: 'return', item_id: id, original_table: 'returns_management', reason: 'Archived from returns management' }) });
             const data = await res.json();
             if (data.status === 'success') {
-                Toastify({ text: 'Return deleted', duration: 2500, gravity: 'top', position: 'right', backgroundColor: '#10b981' }).showToast();
+                Toastify({ text: 'Return archived', duration: 2500, gravity: 'top', position: 'right', backgroundColor: '#10b981' }).showToast();
                 fetchReturns();
-            } else throw new Error(data.message || 'Delete failed');
+            } else throw new Error(data.message || 'Archive failed');
         } catch (err) {
             console.error(err);
-            Toastify({ text: 'Error deleting return', duration: 3000, gravity: 'top', position: 'right', backgroundColor: '#ef4444' }).showToast();
+            Toastify({ text: 'Error archiving return', duration: 3000, gravity: 'top', position: 'right', backgroundColor: '#ef4444' }).showToast();
         }
     }
 
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
     applySearchBtn.addEventListener('click', () => fetchReturns(document.getElementById('searchInput').value));
     clearSearchBtn.addEventListener('click', () => { document.getElementById('searchInput').value = ''; fetchReturns(); });
 
-    window.deleteReturn = deleteReturn;
+    window.archiveReturn = archiveReturn;
     window.editReturn = editReturn;
 
     fetchReturns();

@@ -147,7 +147,7 @@ CONSTRAINT fk_vendor_id FOREIGN KEY (vendor_id)
 To verify the implementation:
 
 1. **Vendor Portal Standalone:**
-   - [ ] Open https://log1.imarketph.com/pages/vendor_portal.php
+   - [ ] Open http://localhost/caplog1/pages/vendor_portal.php
    - [ ] Verify custom header appears (purple gradient)
    - [ ] Check all 4 tabs work (Vendors, Validation, Verification, Requirements)
    - [ ] Test search/filter functionality

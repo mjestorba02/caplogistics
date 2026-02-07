@@ -15,6 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const dateFromInput = document.getElementById('dateFrom');
     const dateToInput = document.getElementById('dateTo');
 
+    // Check if user is admin (account_type == 1)
+    const isAdmin = document.body.dataset.accountType === '1';
+
     function openModal() {
         document.getElementById('modalTitle').textContent = 'Add Shipment';
         document.getElementById('shipmentId').value = '';
@@ -122,14 +125,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             class="bg-indigo-600 text-white px-2 py-1 rounded text-xs hover:bg-indigo-700" title="Edit">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                         </button>
-                        ${s.status !== 'Putaway Complete' ? `<button onclick="approveShipment(${s.id}, '${s.shipment_id}')"
+                        ${isAdmin && s.status !== 'Putaway Complete' ? `<button onclick="approveShipment(${s.id}, '${s.shipment_id}')"
                             class="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700" title="Approve">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         </button>` : ''}
-                        <button onclick="deleteShipment(${s.id})"
-                            class="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700" title="Delete">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                        </button>
+                        ${isAdmin ? `<button onclick="archiveShipment(${s.id})"
+                            class="bg-orange-600 text-white px-2 py-1 rounded text-xs hover:bg-orange-700" title="Archive">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+                        </button>` : ''}
                     </div>
                 </td>
             </tr>
@@ -179,28 +182,34 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    async function deleteShipment(id) {
-        if (!confirm('Delete this shipment?')) return;
+    async function archiveShipment(id) {
+        if (!confirm('Archive this shipment?')) return;
         try {
-            const res = await fetch('../api/inbound_logistics.php', {
-                method: 'DELETE',
-                body: JSON.stringify({ id })
+            const res = await fetch('../api/archive_management.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    archive_type: 'inbound_logistics',
+                    item_id: id,
+                    original_table: 'inbound_logistics',
+                    reason: 'Archived from inbound logistics'
+                })
             });
             const data = await res.json();
             if (data.status === 'success') {
                 Toastify({
-                    text: 'Shipment deleted',
+                    text: 'Shipment archived',
                     duration: 2500,
                     gravity: 'top',
                     position: 'right',
                     backgroundColor: '#10b981'
                 }).showToast();
                 fetchShipments();
-            } else throw new Error(data.message || 'Delete failed');
+            } else throw new Error(data.message || 'Archive failed');
         } catch (err) {
             console.error(err);
             Toastify({
-                text: 'Error deleting shipment',
+                text: 'Error archiving shipment',
                 duration: 3000,
                 gravity: 'top',
                 position: 'right',
@@ -309,7 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchShipments();
     });
 
-    window.deleteShipment = deleteShipment;
+    window.archiveShipment = archiveShipment;
     window.editShipment = editShipment;
     window.approveShipment = approveShipment;
     window.viewShipment = viewShipment;

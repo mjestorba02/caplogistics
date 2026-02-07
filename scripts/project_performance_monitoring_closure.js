@@ -28,7 +28,7 @@ function renderPerformance(records) {
             <td class="px-6 py-4">${r.cost_performance_index}</td>
             <td class="px-6 py-4">
                 <button onclick="editPerformance(${r.id})" class="text-blue-600 hover:text-blue-800 mr-2">Edit</button>
-                <button onclick="deletePerformance(${r.id})" class="text-red-600 hover:text-red-800">Delete</button>
+                <button onclick="archivePerformance(${r.id})" class="text-orange-600 hover:text-orange-800">Archive</button>
             </td>
         </tr>
     `).join('') || '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No records found</td></tr>';
@@ -86,17 +86,17 @@ async function editPerformance(id) {
     } catch (error) { Toastify({ text: 'Error loading record', backgroundColor: '#ff4757' }).showToast(); }
 }
 
-async function deletePerformance(id) {
+async function archivePerformance(id) {
     if (!confirm('Are you sure?')) return;
     try {
-        const response = await fetch('../api/project_performance_monitoring_closure.php', {
-            method: 'DELETE',
+        const response = await fetch('../api/archive_management.php', {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id })
+            body: JSON.stringify({ archive_type: 'performance', item_id: id, original_table: 'project_performance_monitoring_closure', reason: 'Archived from performance monitoring' })
         });
         const data = await response.json();
         if (data.status === 'success') {
-            Toastify({ text: 'Record deleted', backgroundColor: '#2ed573' }).showToast();
+            Toastify({ text: 'Record archived', backgroundColor: '#2ed573' }).showToast();
             loadPerformance();
         } else throw new Error(data.message);
     } catch (error) { Toastify({ text: error.message, backgroundColor: '#ff4757' }).showToast(); }

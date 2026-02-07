@@ -57,7 +57,7 @@ This is a comprehensive supplier/vendor management system for handling registrat
 - **File:** `pages/vendor_portal.php`
 - **Purpose:** Main user interface
 - **Features:** 4 tabs - Vendors, Validation, Verification, Requirements
-- **Access:** https://log1.imarketph.com/pages/vendor_portal.php
+- **Access:** http://localhost/caplog1/pages/vendor_portal.php
 
 ### JavaScript
 - **File:** `scripts/vendor_portal.js`
@@ -82,7 +82,7 @@ SOURCE vendor_portal_tables.sql;
 ### Step 2: Access the Portal
 Navigate to:
 ```
-https://log1.imarketph.com/pages/vendor_portal.php
+http://localhost/caplog1/pages/vendor_portal.php
 ```
 
 ### Step 3: Start Using
@@ -204,7 +204,7 @@ https://log1.imarketph.com/pages/vendor_portal.php
 **A:** Follow the 3-step Quick Start above, or see `VENDOR_PORTAL_SETUP_CHECKLIST.md`
 
 ### Q: Where do I access the portal?
-**A:** https://log1.imarketph.com/pages/vendor_portal.php (after login)
+**A:** http://localhost/caplog1/pages/vendor_portal.php (after login)
 
 ### Q: What's the database password?
 **A:** Check `/api/db.php` for your database credentials

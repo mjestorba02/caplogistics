@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p class="text-sm">Status: <span class="px-2 py-1 rounded text-xs ${p.status === 'Completed' ? 'bg-green-100 text-green-800' : p.status === 'InProgress' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100'}">${p.status}</span></p>
                 <div class="mt-2 flex gap-2">
                     <button onclick='editProject(${JSON.stringify(p)})' class="text-indigo-600 text-sm">Edit</button>
-                    <button onclick="deleteProject(${p.id})" class="text-red-600 text-sm">Delete</button>
+                    <button onclick="archiveProject(${p.id})" class="text-yellow-600 text-sm">Archive</button>
                 </div>
             </div>
         `).join('');
@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p class="text-sm">Status: <span class="px-2 py-1 rounded text-xs ${r.status === 'Approved' ? 'bg-green-100 text-green-800' : r.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100'}">${r.status}</span></p>
                 <div class="mt-2 flex gap-2">
                     <button onclick='updateRequestStatus(${r.id})' class="text-indigo-600 text-sm">Update Status</button>
-                    <button onclick="deleteRequest(${r.id})" class="text-red-600 text-sm">Delete</button>
+                    <button onclick="archiveRequest(${r.id})" class="text-yellow-600 text-sm">Archive</button>
                 </div>
             </div>
         `).join('');
@@ -203,21 +203,18 @@ document.addEventListener('DOMContentLoaded', () => {
         projectModal.classList.add('flex');
     }
 
-    async function deleteProject(id) {
-        if (!confirm('Delete this project?')) return;
+    async function archiveProject(id) {
+        if (!confirm('Archive this project? It will be recoverable from Archive.')) return;
         try {
-            const res = await fetch('../api/project_planning_request.php', {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ project_id: id })
-            });
+            const payload = { archive_type: 'project', item_id: id, original_table: 'projects', reason: 'Archived from UI' };
+            const res = await fetch('../api/archive_management.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             const data = await res.json();
             if (data.status === 'success') {
-                Toastify({ text: data.message, duration: 2500, backgroundColor: '#10b981' }).showToast();
+                Toastify({ text: data.message || 'Project archived', duration: 2500, backgroundColor: '#10b981' }).showToast();
                 fetchData();
             }
         } catch (err) {
-            Toastify({ text: 'Error deleting project', duration: 3000, backgroundColor: '#ef4444' }).showToast();
+            Toastify({ text: 'Error archiving project', duration: 3000, backgroundColor: '#ef4444' }).showToast();
         }
     }
 
@@ -237,21 +234,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function deleteRequest(id) {
-        if (!confirm('Delete this request?')) return;
+    async function archiveRequest(id) {
+        if (!confirm('Archive this request? It will be recoverable from Archive.')) return;
         try {
-            const res = await fetch('../api/project_planning_request.php', {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ request_id: id })
-            });
+            const payload = { archive_type: 'request', item_id: id, original_table: 'project_requests', reason: 'Archived from UI' };
+            const res = await fetch('../api/archive_management.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             const data = await res.json();
             if (data.status === 'success') {
-                Toastify({ text: data.message, duration: 2500, backgroundColor: '#10b981' }).showToast();
+                Toastify({ text: data.message || 'Request archived', duration: 2500, backgroundColor: '#10b981' }).showToast();
                 fetchData();
             }
         } catch (err) {
-            Toastify({ text: 'Error deleting request', duration: 3000, backgroundColor: '#ef4444' }).showToast();
+            Toastify({ text: 'Error archiving request', duration: 3000, backgroundColor: '#ef4444' }).showToast();
         }
     }
 

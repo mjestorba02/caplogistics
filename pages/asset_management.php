@@ -30,9 +30,10 @@ $children = <<<'HTML'
             <label class="text-gray-700 font-medium whitespace-nowrap">Status:</label>
             <select id="searchStatus" class="w-full md:w-48 border rounded px-3 py-2">
                 <option value="">All</option>
-                <option value="Release">Release</option>
-                <option value="InTransit">InTransit</option>
-                <option value="Pending">Pending</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+                <option value="Maintenance">Maintenance</option>
+                <option value="Retired">Retired</option>
             </select>
             <button id="applySearch" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">Search</button>
             <button id="clearSearch" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition">Clear</button>
@@ -113,12 +114,22 @@ $children = <<<'HTML'
     </div>
 </div>
 
+<div id="imageModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-[100]">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative">
+        <h2 class="text-2xl font-bold mb-4">Asset Image - <span id="imageName"></span></h2>
+        <img id="modalImage" src="" alt="Asset Image" class="w-full max-h-96 object-contain rounded">
+        <button id="closeImageModal" class="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-2xl">&times;</button>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('modal');
+    const imageModal = document.getElementById('imageModal');
     const openModalBtn = document.getElementById('openModal');
     const closeModalBtn = document.getElementById('closeModal');
     const closeBtn = document.getElementById('closeModalBtn');
+    const closeImageModalBtn = document.getElementById('closeImageModal');
     const form = document.getElementById('assetForm');
     const tableBody = document.getElementById('assetsTable');
     const emptyState = document.getElementById('emptyState');
@@ -139,9 +150,26 @@ document.addEventListener('DOMContentLoaded', () => {
         form.reset();
     }
 
+    function openImageModal(imageSrc, itemName) {
+        if (!imageSrc) {
+            alert('No image available for this asset');
+            return;
+        }
+        document.getElementById('modalImage').src = imageSrc;
+        document.getElementById('imageName').textContent = itemName;
+        imageModal.classList.remove('hidden');
+        imageModal.classList.add('flex');
+    }
+
+    function closeImageModal() {
+        imageModal.classList.add('hidden');
+        imageModal.classList.remove('flex');
+    }
+
     openModalBtn.addEventListener('click', openModal);
     closeModalBtn.addEventListener('click', closeModal);
     closeBtn.addEventListener('click', closeModal);
+    closeImageModalBtn.addEventListener('click', closeImageModal);
 
     async function fetchAssets() {
         try {
@@ -152,11 +180,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (itemNumber) params.append('item_number', itemNumber);
             if (status) params.append('status', status);
 
-            const url = `../api/asset_management.php?${params.toString()}`;
+            const url = `../api/asset_management.php${params.toString() ? '?' + params.toString() : ''}`;
+            
             const res = await fetch(url);
+            
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            
             const data = await res.json();
-
-            console.log('API Response:', data);
             
             if (data.status === 'success' && data.assets && data.assets.length > 0) {
                 renderAssets(data.assets);
@@ -165,9 +197,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 emptyState.classList.remove('hidden');
             }
         } catch (err) {
-            console.error('Fetch Error:', err);
             Toastify({
-                text: 'Error loading assets',
+                text: 'Error loading assets: ' + err.message,
                 duration: 3000,
                 gravity: 'top',
                 position: 'right',
@@ -177,11 +208,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderAssets(assets) {
+        if (!assets || assets.length === 0) {
+            tableBody.innerHTML = '';
+            emptyState.classList.remove('hidden');
+            return;
+        }
+        
+        // Store assets for quick lookup
+        window.assetMap = {};
+        assets.forEach(asset => {
+            window.assetMap[asset.id] = asset;
+        });
+        
         emptyState.classList.add('hidden');
-        tableBody.innerHTML = assets.map(a => `
+        tableBody.innerHTML = assets.map((a, idx) => {
+            let imageSrc = a.image;
+            if (imageSrc && imageSrc.includes('/caplog1/uploads/')) {
+                imageSrc = '../uploads/' + imageSrc.split('/caplog1/uploads/')[1];
+            }
+            return `
             <tr class="border-b hover:bg-gray-50">
                 <td class="px-6 py-3 font-semibold">${a.item_number}</td>
-                <td class="px-6 py-3">${a.image ? `<img src="${a.image}" class="w-12 h-12 rounded" alt="asset">` : 'N/A'}</td>
+                <td class="px-6 py-3">
+                    ${imageSrc ? `<button class="viewImageBtn bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600" data-image="${imageSrc}" data-name="${a.item_name}">View</button>` : '<span class="text-gray-500">N/A</span>'}
+                </td>
                 <td class="px-6 py-3">${a.type_of_asset || ''}</td>
                 <td class="px-6 py-3 text-sm">${a.item_code || ''}</td>
                 <td class="px-6 py-3">${a.item_name || ''}</td>
@@ -197,25 +247,48 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="text-xs text-gray-600">${a.quality_percent}%</span>
                 </td>
                 <td class="px-6 py-3"><span class="px-2 py-1 rounded text-xs font-semibold ${a.status === 'Active' ? 'bg-green-100 text-green-800' : a.status === 'Inactive' ? 'bg-gray-100 text-gray-800' : a.status === 'Maintenance' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}">${a.status}</span></td>
-                <!-- <td class="px-6 py-3"><a href="asset_maintenance.php" class="text-indigo-600 hover:text-indigo-900 font-semibold text-xs">View Maintenance</a></td> -->
                 <td class="px-6 py-3 text-sm">${new Date(a.date).toLocaleDateString()}</td>
                 <td class="px-6 py-3 flex gap-1">
-                    <button onclick='editAsset(${JSON.stringify(a).replace(/"/g, '&quot;')})' class="bg-indigo-600 text-white px-2 py-1 rounded text-xs hover:bg-indigo-700" title="Edit">
+                    <button class="bg-indigo-600 text-white px-2 py-1 rounded text-xs hover:bg-indigo-700 editBtn" data-asset-id="${a.id}" title="Edit">
                         <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                     </button>
-                    <button onclick="deleteAsset(${a.id})" class="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700" title="Delete">
-                        <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    <button class="bg-orange-600 text-white px-2 py-1 rounded text-xs hover:bg-orange-700 archiveBtn" data-id="${a.id}" title="Archive">
+                        <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
                     </button>
                 </td>
             </tr>
-        `).join('');
+        `;
+        }).join('');
+
+        tableBody.querySelectorAll('.viewImageBtn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                openImageModal(this.dataset.image, this.dataset.name);
+            });
+        });
+
+        tableBody.querySelectorAll('.editBtn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const assetId = this.dataset.assetId;
+                const asset = window.assetMap[assetId];
+                if (asset) {
+                    editAsset(asset);
+                } else {
+                    alert('Asset not found');
+                }
+            });
+        });
+
+        tableBody.querySelectorAll('.archiveBtn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                archiveAsset(parseInt(this.dataset.id));
+            });
+        });
     }
 
     function editAsset(asset) {
         document.getElementById('modalTitle').textContent = 'Edit Asset';
         document.getElementById('assetId').value = asset.id;
         document.getElementById('item_number').value = asset.item_number;
-        document.getElementById('image').value = asset.image || '';
         document.getElementById('type_of_asset').value = asset.type_of_asset || '';
         document.getElementById('item_code').value = asset.item_code || '';
         document.getElementById('item_name').value = asset.item_name || '';
@@ -225,36 +298,57 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal();
     }
 
-    async function deleteAsset(id) {
-        if (!confirm('Delete this asset?')) return;
+    async function archiveAsset(id) {
+        if (!confirm('Archive this asset?')) {
+            return;
+        }
         try {
-            const res = await fetch('../api/asset_management.php', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+            const res = await fetch('../api/archive_management.php', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ 
+                    archive_type: 'asset_management', 
+                    item_id: id, 
+                    original_table: 'asset_management', 
+                    reason: 'Archived from asset management' 
+                }) 
+            });
             const data = await res.json();
+            
             if (data.status === 'success') {
-                Toastify({ text: 'Asset deleted', duration: 2500, gravity: 'top', position: 'right', backgroundColor: '#10b981' }).showToast();
+                Toastify({ text: 'Asset archived', duration: 2500, gravity: 'top', position: 'right', backgroundColor: '#10b981' }).showToast();
                 fetchAssets();
-            } else throw new Error(data.message || 'Delete failed');
+            } else {
+                throw new Error(data.message || 'Archive failed');
+            }
         } catch (err) {
-            console.error(err);
-            Toastify({ text: 'Error deleting asset', duration: 3000, gravity: 'top', position: 'right', backgroundColor: '#ef4444' }).showToast();
+            Toastify({ text: 'Error archiving asset', duration: 3000, gravity: 'top', position: 'right', backgroundColor: '#ef4444' }).showToast();
         }
     }
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
+        
         const assetId = document.getElementById('assetId').value;
         const formData = new FormData();
         
-        formData.append('id', assetId || '');
-        formData.append('item_number', document.getElementById('item_number').value);
-        formData.append('type_of_asset', document.getElementById('type_of_asset').value);
-        formData.append('item_code', document.getElementById('item_code').value);
-        formData.append('item_name', document.getElementById('item_name').value);
-        formData.append('purchase_date', document.getElementById('purchase_date').value);
-        formData.append('lifespan_years', document.getElementById('lifespan_years').value);
-        formData.append('status', document.getElementById('status').value);
+        const item_number = document.getElementById('item_number').value;
+        const type_of_asset = document.getElementById('type_of_asset').value;
+        const item_code = document.getElementById('item_code').value;
+        const item_name = document.getElementById('item_name').value;
+        const purchase_date = document.getElementById('purchase_date').value;
+        const lifespan_years = document.getElementById('lifespan_years').value;
+        const status = document.getElementById('status').value;
         
-        // Handle file upload
+        formData.append('id', assetId || '');
+        formData.append('item_number', item_number);
+        formData.append('type_of_asset', type_of_asset);
+        formData.append('item_code', item_code);
+        formData.append('item_name', item_name);
+        formData.append('purchase_date', purchase_date);
+        formData.append('lifespan_years', lifespan_years);
+        formData.append('status', status);
+        
         const imageFile = document.getElementById('image').files[0];
         if (imageFile) {
             formData.append('image', imageFile);
@@ -262,30 +356,37 @@ document.addEventListener('DOMContentLoaded', () => {
         
         try {
             const method = assetId ? 'PUT' : 'POST';
+            
             const res = await fetch('../api/asset_management.php', { 
                 method, 
                 body: formData 
             });
+            
             const result = await res.json();
+            
             if (result.status === 'success') {
                 Toastify({ text: result.message || 'Saved', duration: 2500, gravity: 'top', position: 'right', backgroundColor: '#10b981' }).showToast();
                 closeModal();
                 fetchAssets();
-            } else throw new Error(result.message || 'Save failed');
+            } else {
+                throw new Error(result.message || 'Save failed');
+            }
         } catch (err) {
-            console.error(err);
             Toastify({ text: 'Error saving asset', duration: 3000, gravity: 'top', position: 'right', backgroundColor: '#ef4444' }).showToast();
         }
     });
 
-    applySearchBtn.addEventListener('click', fetchAssets);
+    applySearchBtn.addEventListener('click', () => {
+        fetchAssets();
+    });
+    
     clearSearchBtn.addEventListener('click', () => {
         document.getElementById('searchItem').value = '';
         document.getElementById('searchStatus').value = '';
         fetchAssets();
     });
 
-    window.deleteAsset = deleteAsset;
+    window.archiveAsset = archiveAsset;
     window.editAsset = editAsset;
 
     fetchAssets();

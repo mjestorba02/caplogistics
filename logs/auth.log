@@ -1,0 +1,13 @@
+[2026-02-07 04:31:23] [::1] AUTH_REQUEST_RECEIVED | {"action":"login"}
+[2026-02-07 04:31:23] [::1] INPUT_PARSED | {"action":"login","has_email":true,"has_password":true,"has_otp":false}
+[2026-02-07 04:32:35] [::1] AUTH_REQUEST_RECEIVED | {"action":"login"}
+[2026-02-07 04:32:35] [::1] INPUT_PARSED | {"action":"login","has_email":true,"has_password":true,"has_otp":false}
+[2026-02-07 04:32:46] [::1] AUTH_REQUEST_RECEIVED | {"action":"login"}
+[2026-02-07 04:32:46] [::1] INPUT_PARSED | {"action":"login","has_email":true,"has_password":true,"has_otp":false}
+[2026-02-07 04:32:48] [::1] OTP_GENERATED | {"user_id":19,"email":"03.ma***","otp":"317990","expires_at":"2026-02-07 04:42:46"}
+[2026-02-07 04:32:48] [::1] SESSION_CREATED | {"temp_user_id":19}
+[2026-02-07 04:32:48] [::1] OTP_RESPONSE_SENT | {"redirect_url":"pages\/otp_verify.php"}
+[2026-02-07 04:33:01] [::1] AUTH_REQUEST_RECEIVED | {"action":"verify_otp"}
+[2026-02-07 04:33:01] [::1] INPUT_PARSED | {"action":"verify_otp","has_email":false,"has_password":false,"has_otp":true}
+[2026-02-07 04:33:08] [::1] AUTH_REQUEST_RECEIVED | {"action":"verify_otp"}
+[2026-02-07 04:33:08] [::1] INPUT_PARSED | {"action":"verify_otp","has_email":false,"has_password":false,"has_otp":true}

@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <td class="px-6 py-3 text-sm">${new Date(vendor.created_at).toLocaleDateString()}</td>
                         <td class="px-6 py-3 flex gap-2">
                             <button onclick="window.editVendor(${vendor.id})" class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700">Edit</button>
-                            <button onclick="window.deleteVendor(${vendor.id})" class="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700">Delete</button>
+                            <button onclick="window.archiveVendor(${vendor.id})" class="bg-yellow-600 text-white px-3 py-1 rounded text-xs hover:bg-yellow-700">Archive</button>
                         </td>
                     </tr>
                 `).join('');
@@ -190,20 +190,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    window.deleteVendor = async function(vendorId) {
-        if (!confirm('Are you sure you want to delete this vendor?')) return;
+    window.archiveVendor = async function(vendorId) {
+        if (!confirm('Archive this vendor? It will be removed but can be restored from Archive.')) return;
         try {
-            const response = await fetch(`${API_BASE}?id=${vendorId}`, { method: 'DELETE' });
+            const payload = { archive_type: 'vendor', item_id: vendorId, original_table: 'vendor_portal_registration', reason: 'Archived from Vendor Portal' };
+            const response = await fetch('../api/archive_management.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             const data = await response.json();
             if (data.status === 'success') {
-                showToast('Vendor deleted successfully');
+                showToast('Vendor archived successfully');
                 loadVendors();
+                loadVendorDropdowns();
             } else {
-                showToast(data.message || 'Error deleting vendor', 'error');
+                showToast(data.message || 'Error archiving vendor', 'error');
             }
         } catch (err) {
             console.error(err);
-            showToast('Error deleting vendor', 'error');
+            showToast('Error archiving vendor', 'error');
         }
     };
 

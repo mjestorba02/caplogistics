@@ -1,10 +1,13 @@
 <?php
 session_start();
 if (!isset($_SESSION['id'])) {
-    header('Location:https://log1.imarketph.com');
+    header('Location:http://localhost/caplog1');
     exit();
 }
 include '../layout/adminLayout.php';
+
+// Get user's account type for access control
+$account_type = isset($_SESSION['account_type']) ? intval($_SESSION['account_type']) : 0;
 
 $children = <<<'HTML'
 <div class="p-6">
@@ -203,4 +206,4 @@ $children = <<<'HTML'
 
 <script src="../scripts/inbound_logistics.js"></script>
 HTML;
-adminLayout($children);
+adminLayout($children, $account_type);

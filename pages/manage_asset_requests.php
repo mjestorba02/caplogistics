@@ -2,12 +2,24 @@
 session_start();
 require_once __DIR__ . '/../layout/adminLayout.php';
 require_once __DIR__ . '/../api/db.php';
+require_once __DIR__ . '/../api/auth_helpers.php';
 
 $user_id = $_SESSION['id'] ?? null;
 $user_name = $_SESSION['name'] ?? 'Unknown User';
+$account_type = $_SESSION['account_type'] ?? 0;
 
 if (!$user_id) {
-    header('Location: ../login.php');
+    header('Location: ../index.php');
+    exit;
+}
+
+// Check if user has admin privileges
+if ($account_type != 1) {
+    echo "<div class='p-6 bg-red-100 text-red-800 rounded-lg m-6'>";
+    echo "<h2 class='text-xl font-bold mb-2'>Access Denied</h2>";
+    echo "<p>Only administrators can access this page. You are logged in as a regular user.</p>";
+    echo "<p class='mt-2'><a href='dashboard.php' class='text-red-600 hover:underline'>Return to Dashboard</a></p>";
+    echo "</div>";
     exit;
 }
 

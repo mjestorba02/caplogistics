@@ -2,14 +2,26 @@
 session_start();
 header('Content-Type: application/json');
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/auth_helpers.php';
 
 if (!$conn) {
     json_response(['status' => 'error', 'message' => 'Database connection failed'], 500);
 }
 
+// Require authentication
 if (!isset($_SESSION['id'])) {
     http_response_code(401);
     echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
+    exit;
+}
+
+// Require admin access for this endpoint
+if (!isAdmin()) {
+    http_response_code(403);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Admin access required. Only administrators can approve/deny requests.'
+    ]);
     exit;
 }
 

@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <td class="px-6 py-3">${doc.created_at ? doc.created_at.split(' ')[0] : ''}</td>
             <td class="px-6 py-3">
               <button class="viewBtn text-indigo-600 hover:underline" data-id="${doc.id}">View</button>
-              <button class="deleteBtn text-red-600 hover:underline" data-id="${doc.id}">Delete</button>
+              <button class="archiveBtn text-yellow-600 hover:underline" data-id="${doc.id}">Archive</button>
             </td>`;
           docsTable.appendChild(tr);
         });
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } else empty.classList.remove('hidden');
 
       document.querySelectorAll('.viewBtn').forEach(b => b.addEventListener('click', (e) => viewDoc(e.target.dataset.id)));
-      document.querySelectorAll('.deleteBtn').forEach(b => b.addEventListener('click', (e) => deleteDoc(e.target.dataset.id)));
+      document.querySelectorAll('.archiveBtn').forEach(b => b.addEventListener('click', (e) => archiveDoc(e.target.dataset.id)));
     });
   }
 
@@ -92,9 +92,10 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.href = `document_verification_validation.php?id=${id}`;
   }
 
-  function deleteDoc(id) {
-    if (!confirm('Delete this document?')) return;
-    fetch(`../api/documents_delete.php?id=${id}`, { method: 'DELETE' })
+  function archiveDoc(id) {
+    if (!confirm('Archive this document? It will be recoverable from Archive.')) return;
+    const payload = { archive_type: 'document', item_id: id, original_table: 'documents', reason: 'Archived from UI' };
+    fetch('../api/archive_management.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
       .then(r => r.json()).then(d => { if (d.status === 'success') fetchDocs(); else alert(d.message); });
   }
 

@@ -131,7 +131,7 @@ mysql -u root -p logcap1 < vendor_portal_tables.sql
 ```
 
 ### Step 2: Access Portal (1 minute)
-Navigate to: `https://log1.imarketph.com/pages/vendor_portal.php`
+Navigate to: `http://localhost/caplog1/pages/vendor_portal.php`
 
 ### Step 3: Start Using (Immediately)
 - Register vendors

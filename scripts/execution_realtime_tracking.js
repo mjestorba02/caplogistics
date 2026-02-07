@@ -28,7 +28,7 @@ function renderTracking(records) {
             <td class="px-6 py-4"><span class="bg-orange-200 text-orange-800 px-2 py-1 rounded">${r.tracking_status}</span></td>
             <td class="px-6 py-4">
                 <button onclick="editTracking(${r.id})" class="text-blue-600 hover:text-blue-800 mr-2">Edit</button>
-                <button onclick="deleteTracking(${r.id})" class="text-red-600 hover:text-red-800">Delete</button>
+                <button onclick="archiveTracking(${r.id})" class="text-orange-600 hover:text-orange-800">Archive</button>
             </td>
         </tr>
     `).join('') || '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No records found</td></tr>';
@@ -88,17 +88,17 @@ async function editTracking(id) {
     } catch (error) { Toastify({ text: 'Error loading record', backgroundColor: '#ff4757' }).showToast(); }
 }
 
-async function deleteTracking(id) {
+async function archiveTracking(id) {
     if (!confirm('Are you sure?')) return;
     try {
-        const response = await fetch('../api/execution_realtime_tracking.php', {
-            method: 'DELETE',
+        const response = await fetch('../api/archive_management.php', {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id })
+            body: JSON.stringify({ archive_type: 'tracking', item_id: id, original_table: 'execution_realtime_tracking', reason: 'Archived from tracking' })
         });
         const data = await response.json();
         if (data.status === 'success') {
-            Toastify({ text: 'Record deleted', backgroundColor: '#2ed573' }).showToast();
+            Toastify({ text: 'Record archived', backgroundColor: '#2ed573' }).showToast();
             loadTracking();
         } else throw new Error(data.message);
     } catch (error) { Toastify({ text: error.message, backgroundColor: '#ff4757' }).showToast(); }

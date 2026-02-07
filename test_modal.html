@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Asset Management - Debug Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <h1>Asset Management - JavaScript Debug Test</h1>
+    
+    <button id="openModal">Add Asset (Test)</button>
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-[100]">
+        <div class="bg-white rounded-lg p-6">
+            <h2>Test Modal</h2>
+            <p>If you can see this, the modal is working</p>
+            <button id="closeModal">Close</button>
+        </div>
+    </div>
+
+    <script>
+        console.log('✓ Script loaded');
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('✓ DOM loaded');
+            const modal = document.getElementById('modal');
+            const btn = document.getElementById('openModal');
+            const closeBtn = document.getElementById('closeModal');
+            
+            console.log('Button:', btn);
+            console.log('Modal:', modal);
+            
+            btn.addEventListener('click', () => {
+                console.log('Button clicked!');
+                console.log('Before - modal classes:', modal.className);
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                console.log('After - modal classes:', modal.className);
+            });
+            
+            closeBtn.addEventListener('click', () => {
+                console.log('Close clicked!');
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            });
+        });
+    </script>
+</body>
+</html>

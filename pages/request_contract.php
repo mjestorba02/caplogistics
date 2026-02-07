@@ -103,14 +103,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         <h3 class="font-bold text-lg">${c.contract_title}</h3>
                         <p class="text-gray-600">Supplier: ${c.supplier_name}</p>
                         <p class="text-sm">Project: ${c.project_name || 'N/A'}</p>
-                        <p class="text-sm">Value: $${c.contract_value || 'N/A'}</p>
+                        <p class="text-sm">Value: ₱${c.contract_value || 'N/A'}</p>
                         <p class="text-sm">Requested: ${new Date(c.request_date).toLocaleDateString()}</p>
                     </div>
                     <div class="text-right">
                         <span class="px-2 py-1 rounded text-xs ${c.status === 'Approved' ? 'bg-green-100 text-green-800' : c.status === 'Requested' ? 'bg-yellow-100 text-yellow-800' : c.status === 'Signed' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100'}">${c.status}</span>
                         <div class="mt-2 space-x-2">
                             <button onclick='updateContractStatus(${c.id})' class="text-indigo-600 text-sm">Update Status</button>
-                            <button onclick="deleteContract(${c.id})" class="text-red-600 text-sm">Delete</button>
+                            <button onclick="archiveContract(${c.id})" class="text-yellow-600 text-sm">Archive</button>
                         </div>
                     </div>
                 </div>
@@ -134,21 +134,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function deleteContract(id) {
-        if (!confirm('Delete this contract request?')) return;
+    async function archiveContract(id) {
+        if (!confirm('Archive this contract request? It will be recoverable from Archive.')) return;
         try {
-            const res = await fetch('../api/request_contract.php', {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contract_id: id })
-            });
+            const payload = { archive_type: 'contract_request', item_id: id, original_table: 'contract_requests', reason: 'Archived from UI' };
+            const res = await fetch('../api/archive_management.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             const data = await res.json();
             if (data.status === 'success') {
-                Toastify({ text: data.message, duration: 2500, backgroundColor: '#10b981' }).showToast();
+                Toastify({ text: data.message || 'Contract request archived', duration: 2500, backgroundColor: '#10b981' }).showToast();
                 fetchContracts();
             }
         } catch (err) {
-            Toastify({ text: 'Error deleting contract', duration: 3000, backgroundColor: '#ef4444' }).showToast();
+            Toastify({ text: 'Error archiving contract', duration: 3000, backgroundColor: '#ef4444' }).showToast();
         }
     }
 
@@ -187,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     window.updateContractStatus = updateContractStatus;
-    window.deleteContract = deleteContract;
+    window.archiveContract = archiveContract;
 
     fetchContracts();
 });

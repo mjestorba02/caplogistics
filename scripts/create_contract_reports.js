@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td class="px-6 py-3">${c.start_date}</td>
                 <td class="px-6 py-3">${c.end_date}</td>
                 <td class="px-6 py-3"><span class="px-2 py-1 rounded text-xs font-semibold ${c.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">${c.status}</span></td>
-                <td class="px-6 py-3 flex gap-2"><button onclick='editContract(${JSON.stringify(c).replace(/"/g, '&quot;')})' class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700">Edit</button><button onclick="deleteContract(${c.id})" class="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700">Delete</button></td>
+                <td class="px-6 py-3 flex gap-2"><button onclick='editContract(${JSON.stringify(c).replace(/"/g, '&quot;')})' class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700">Edit</button><button onclick="archiveContract(${c.id})" class="bg-yellow-600 text-white px-3 py-1 rounded text-xs hover:bg-yellow-700">Archive</button></td>
             </tr>
         `).join('');
     }
@@ -122,18 +122,19 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal();
     }
 
-    async function deleteContract(id) {
-        if (!confirm('Delete this contract?')) return;
+    async function archiveContract(id) {
+        if (!confirm('Archive this contract? It will be removed from the list but recoverable from Archive.')) return;
         try {
-            const res = await fetch('../api/create_contract_reports.php', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+            const payload = { archive_type: 'contract', item_id: id, original_table: 'procurement_contracts', reason: 'Archived from UI' };
+            const res = await fetch('../api/archive_management.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             const data = await res.json();
             if (data.status === 'success') {
-                Toastify({ text: 'Contract deleted', duration: 2500, gravity: 'top', position: 'right', backgroundColor: '#10b981' }).showToast();
+                Toastify({ text: 'Contract archived', duration: 2500, gravity: 'top', position: 'right', backgroundColor: '#10b981' }).showToast();
                 fetchContracts();
-            } else throw new Error(data.message || 'Delete failed');
+            } else throw new Error(data.message || 'Archive failed');
         } catch (err) {
             console.error(err);
-            Toastify({ text: 'Error deleting contract', duration: 3000, gravity: 'top', position: 'right', backgroundColor: '#ef4444' }).showToast();
+            Toastify({ text: 'Error archiving contract', duration: 3000, gravity: 'top', position: 'right', backgroundColor: '#ef4444' }).showToast();
         }
     }
 
@@ -173,13 +174,80 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     generateReportBtn.addEventListener('click', () => {
-        const dateFrom = document.getElementById('dateFrom')?.value || '';
-        const dateTo = document.getElementById('dateTo')?.value || '';
-        const url = `../api/create_contract_reports.php?action=report&date_from=${dateFrom}&date_to=${dateTo}`;
-        window.open(url, '_blank');
+        // Show password verification modal
+        const passwordModal = document.createElement('div');
+        passwordModal.className = 'fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50';
+        passwordModal.innerHTML = `
+            <div class="bg-white rounded-lg shadow-lg w-96 p-6">
+                <h2 class="text-2xl font-bold mb-4">Verify Your Identity</h2>
+                <p class="text-gray-600 mb-4">Please enter your password to generate the report</p>
+                <div class="mb-4">
+                    <label class="block mb-2 text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="reportPassword" class="w-full border rounded px-3 py-2" placeholder="Enter your password" />
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button type="button" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" id="cancelPasswordBtn">Cancel</button>
+                    <button type="button" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700" id="confirmPasswordBtn">Generate Report</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(passwordModal);
+
+        const passwordInput = document.getElementById('reportPassword');
+        const confirmBtn = document.getElementById('confirmPasswordBtn');
+        const cancelBtn = document.getElementById('cancelPasswordBtn');
+
+        function closePasswordModal() {
+            passwordModal.remove();
+        }
+
+        cancelBtn.addEventListener('click', closePasswordModal);
+
+        confirmBtn.addEventListener('click', async () => {
+            const password = passwordInput.value.trim();
+            if (!password) {
+                Toastify({ text: 'Please enter your password', duration: 3000, gravity: 'top', position: 'right', backgroundColor: '#ef4444' }).showToast();
+                return;
+            }
+
+            const dateFrom = document.getElementById('dateFrom')?.value || '';
+            const dateTo = document.getElementById('dateTo')?.value || '';
+            const url = `../api/create_contract_reports.php?action=report&date_from=${dateFrom}&date_to=${dateTo}&password=${encodeURIComponent(password)}`;
+            
+            try {
+                // Test if password is correct first
+                const response = await fetch(url, { method: 'HEAD' });
+                if (response.status === 401) {
+                    Toastify({ text: 'Incorrect password', duration: 3000, gravity: 'top', position: 'right', backgroundColor: '#ef4444' }).showToast();
+                } else {
+                    closePasswordModal();
+                    window.location.href = url;
+                    Toastify({ text: 'Report generating...', duration: 2000, gravity: 'top', position: 'right', backgroundColor: '#10b981' }).showToast();
+                }
+            } catch (err) {
+                // If error, try to generate anyway
+                closePasswordModal();
+                window.location.href = url;
+                Toastify({ text: 'Report generating...', duration: 2000, gravity: 'top', position: 'right', backgroundColor: '#10b981' }).showToast();
+            }
+        });
+
+        // Focus on password input
+        passwordInput.focus();
+
+        // Allow Enter key to submit
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') confirmBtn.click();
+        });
+
+        // Close on background click
+        passwordModal.addEventListener('click', (e) => {
+            if (e.target === passwordModal) closePasswordModal();
+        });
     });
 
-    window.deleteContract = deleteContract;
+    window.archiveContract = archiveContract;
     window.editContract = editContract;
 
     // Load vendors and contracts on page load

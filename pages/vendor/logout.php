@@ -9,6 +9,6 @@ $_SESSION = array();
 session_destroy();
 
 // Redirect to login page
-header('Location: https://log1.imarketph.com/pages/vendor/login.php');
+header('Location: http://localhost/caplog1/pages/vendor/login.php');
 exit();
 ?>

@@ -43,7 +43,7 @@ function renderTable(data = receivingData) {
             </td>
             <td class="px-6 py-3">
                 <button onclick="editReceiving(${row.id})" class="text-indigo-600 hover:underline mr-2">Edit</button>
-                <button onclick="deleteReceiving(${row.id})" class="text-red-600 hover:underline">Delete</button>
+                <button onclick="archiveReceiving(${row.id})" class="text-orange-600 hover:underline">Archive</button>
             </td>
         `;
         tableBody.appendChild(tr);
@@ -227,15 +227,19 @@ window.editReceiving = (id) => {
     receivingModal.classList.add('flex');
 };
 
-window.deleteReceiving = (id) => {
-    if (!confirm('Are you sure you want to delete this record?')) return;
+window.archiveReceiving = (id) => {
+    if (!confirm('Are you sure you want to archive this record?')) return;
 
-    fetch('../api/asset_receiving_logistics.php?id=' + id, { method: 'DELETE' })
+    fetch('../api/archive_management.php', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ archive_type: 'receiving', item_id: id, original_table: 'asset_receiving_logistics', reason: 'Archived from receiving' })
+    })
         .then(res => res.json())
         .then(result => {
             if (result.status === 'success') {
                 Toastify({
-                    text: 'Deleted successfully',
+                    text: 'Archived successfully',
                     duration: 3000,
                     gravity: 'top',
                     position: 'right',
@@ -243,7 +247,7 @@ window.deleteReceiving = (id) => {
                 }).showToast();
                 fetchReceiving();
             } else {
-                throw new Error(result.message || 'Delete failed');
+                throw new Error(result.message || 'Archive failed');
             }
         })
         .catch(err => {

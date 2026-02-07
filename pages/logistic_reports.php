@@ -37,11 +37,15 @@ $children = <<<'HTML'
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white p-6 rounded-lg shadow">
             <h2 class="text-xl font-bold mb-4">Project Status Distribution</h2>
-            <canvas id="projectStatusChart"></canvas>
+            <div style="max-height: 280px; position: relative;">
+                <canvas id="projectStatusChart"></canvas>
+            </div>
         </div>
         <div class="bg-white p-6 rounded-lg shadow">
             <h2 class="text-xl font-bold mb-4">Request Status Distribution</h2>
-            <canvas id="requestStatusChart"></canvas>
+            <div style="max-height: 280px; position: relative;">
+                <canvas id="requestStatusChart"></canvas>
+            </div>
         </div>
     </div>
 
@@ -95,8 +99,9 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
-                    legend: { position: 'bottom' }
+                    legend: { position: 'bottom', labels: { font: { size: 12 }, padding: 10 } }
                 }
             }
         });
@@ -115,8 +120,9 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
-                    legend: { position: 'bottom' }
+                    legend: { position: 'bottom', labels: { font: { size: 12 }, padding: 10 } }
                 }
             }
         });

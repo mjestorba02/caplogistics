@@ -1,0 +1,4 @@
+[2026-02-07 04:32:48] [ERROR] mail() failed to 03.markjohn.30@gmail.com: mail() failed or not configured
+[2026-02-07 04:35:56] [ERROR] mail() failed to 03.markjohn.30@gmail.com: mail() failed or not configured
+[2026-02-07 04:39:03] [SUCCESS] PHPMailer sent to 03.markjohn.30@gmail.com | Subject: E-Commerce Logistics Management Portal - Your OTP Code
+[2026-02-07 04:39:54] [SUCCESS] PHPMailer sent to 03.markjohn.30@gmail.com | Subject: E-Commerce Logistics Management Portal - Your OTP Code

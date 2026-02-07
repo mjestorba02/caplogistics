@@ -41,7 +41,7 @@ STEP 4: Verify Success
 □ Check: New table "supplier_identification" appears in left sidebar
 
 STEP 5: Test Module 1
-□ Go to: https://log1.imarketph.com/pages/supplier_identification.php
+□ Go to: http://localhost/caplog1/pages/supplier_identification.php
 □ Wait for page to load
 □ Look for: Table with 3 suppliers displayed
 □ Click: "Add Supplier" button

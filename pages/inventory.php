@@ -2,7 +2,7 @@
 include '../layout/adminLayout.php';
 session_start ();
 if (!isset($_SESSION['id'])) {
-    header('Location:https://log1.imarketph.com');
+    header('Location:http://localhost/caplog1');
     exit();
 }
 $children = '
@@ -175,7 +175,7 @@ function showToast(message, type) {
 }
 
 // API endpoint
-const apiUrl = "https://log1.imarketph.com/api/inventory.php";
+const apiUrl = "http://localhost/caplog1/api/inventory.php";
 let inventoryItems = [];
 let filteredItems = [];
 let categories = [];
@@ -258,8 +258,8 @@ function renderInventory() {
                         <button class="text-blue-600 hover:text-blue-800 mr-3" title="Edit" onclick="editItem(${item.id})">
                             <i class="bx bx-edit-alt"></i>
                         </button>
-                        <button class="text-red-600 hover:text-red-800" title="Delete" onclick="deleteItem(${item.id})">
-                            <i class="bx bx-trash"></i>
+                        <button class="text-orange-600 hover:text-orange-800" title="Archive" onclick="archiveItem(${item.id})">
+                            <i class="bx bx-archive"></i>
                         </button>
                     </td>
                 </tr>
@@ -294,8 +294,8 @@ function renderInventory() {
                     <button class="text-blue-600 hover:text-blue-800" onclick="editItem(${item.id})">
                         <i class="bx bx-edit-alt"></i> Edit
                     </button>
-                    <button class="text-red-600 hover:text-red-800" onclick="deleteItem(${item.id})">
-                        <i class="bx bx-trash"></i> Delete
+                    <button class="text-orange-600 hover:text-orange-800" onclick="archiveItem(${item.id})">
+                        <i class="bx bx-archive"></i> Archive
                     </button>
                 </div>
             </div>
@@ -387,18 +387,22 @@ async function fetchInventory() {
     }
 }
 
-// Delete item
-async function deleteItem(id) {
-    if(!confirm("Are you sure you want to delete this item?")) return;
+// Archive item
+async function archiveItem(id) {
+    if(!confirm("Are you sure you want to archive this item?")) return;
 
     try {
-        const res = await fetch(`${apiUrl}?id=${id}`, { method: "DELETE" });
+        const res = await fetch('../api/archive_management.php', { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ archive_type: 'inventory', item_id: id, original_table: 'inventory', reason: 'Archived from inventory' })
+        });
         const result = await res.json();
         showToast(result.message, "success");
         fetchInventory();
     } catch (error) {
-        showToast("Error deleting item", "error");
-        console.error("Error deleting item:", error);
+        showToast("Error archiving item", "error");
+        console.error("Error archiving item:", error);
     }
 }
 
@@ -435,7 +439,7 @@ async function editItem(id) {
         const previewImage = document.getElementById('previewImage');
         const fileInput = document.getElementById('product_photo');
         
-        if (item.product_photo_url && item.product_photo_url !== 'https://log1.imarketph.com/uploads/products/') {
+        if (item.product_photo_url && item.product_photo_url !== 'http://localhost/caplog1/uploads/products/') {
             previewImage.src = item.product_photo_url;
             preview.classList.remove('hidden');
             // Clear the file input so we don't accidentally overwrite the existing photo

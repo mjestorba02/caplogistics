@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <td class="px-6 py-3 text-sm"><span class="px-2 py-1 rounded text-xs bg-purple-100 text-purple-800">${a.disposal_method}</span></td>
         <td class="px-6 py-3 text-sm">${a.disposal_date || 'Pending'}</td>
         <td class="px-6 py-3 text-sm">${a.archived ? 'Yes' : 'No'}</td>
-        <td class="px-6 py-3 flex gap-2"><button onclick='editDisposal(${JSON.stringify(a).replace(/"/g, '&quot;')})' class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700">Edit</button><button onclick="deleteDisposal(${a.id})" class="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700">Delete</button></td>
+        <td class="px-6 py-3 flex gap-2"><button onclick='editDisposal(${JSON.stringify(a).replace(/"/g, '&quot;')})' class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700">Edit</button><button onclick="archiveDisposal(${a.id})" class="bg-orange-600 text-white px-3 py-1 rounded text-xs hover:bg-orange-700">Archive</button></td>
       </tr>`)
       .join('');
   }
@@ -93,20 +93,20 @@ document.addEventListener('DOMContentLoaded', () => {
     openModal();
   }
 
-  async function deleteDisposal(id) {
-    if (!confirm('Delete this disposal record?')) return;
+  async function archiveDisposal(id) {
+    if (!confirm('Archive this disposal record?')) return;
     try {
-      const res = await fetch(`../api/asset_end_of_life_disposal.php?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+      const res = await fetch('../api/archive_management.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ archive_type: 'asset_disposal', item_id: id, original_table: 'asset_end_of_life_disposal', reason: 'Archived from disposal' }) });
       const data = await res.json();
-      if (res.ok && data.status === 'success') {
-        Toastify({ text: 'Disposal deleted', duration: 3000, gravity: 'top', position: 'right', backgroundColor: 'linear-gradient(to right, #16a34a, #86efac)' }).showToast();
+      if (data.status === 'success') {
+        Toastify({ text: 'Disposal archived', duration: 3000, gravity: 'top', position: 'right', backgroundColor: 'linear-gradient(to right, #16a34a, #86efac)' }).showToast();
         fetchDisposals();
       } else {
-        throw new Error(data.message || 'Delete failed');
+        throw new Error(data.message || 'Archive failed');
       }
     } catch (err) {
       console.error(err);
-      alert('Error deleting disposal: ' + (err.message || err));
+      alert('Error archiving disposal: ' + (err.message || err));
     }
   }
 
@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
   applyFilterBtn?.addEventListener('click', () => fetchDisposals(document.getElementById('filterInput').value));
   clearFilterBtn?.addEventListener('click', () => { document.getElementById('filterInput').value = ''; fetchDisposals(); });
 
-  window.deleteDisposal = deleteDisposal;
+  window.archiveDisposal = archiveDisposal;
   window.editDisposal = editDisposal;
 
   loadAssets();

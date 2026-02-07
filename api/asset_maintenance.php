@@ -82,9 +82,29 @@ try {
                 json_response(['status' => 'error', 'message' => 'ID is required'], 400);
             }
 
-            $sql = "UPDATE asset_maintenance SET status = ?, notes = ? WHERE id = ?";
+            // Get the maintenance record to find the asset_id
+            $getMaintenance = $conn->prepare("SELECT asset_id FROM asset_maintenance WHERE id = ?");
+            $getMaintenance->execute([$id]);
+            $maintenance = $getMaintenance->fetch(PDO::FETCH_ASSOC);
+
+            $sql = "UPDATE asset_maintenance SET status = ?, notes = ?, updated_at = NOW() WHERE id = ?";
             $stmt = $conn->prepare($sql);
             $stmt->execute([$status, $notes, $id]);
+
+            // If status is Completed, improve the asset's quality
+            if ($status === 'Completed' && $maintenance) {
+                // Find the asset in asset_management by asset_id
+                $assetStmt = $conn->prepare("SELECT id, quality_multiplier FROM asset_management WHERE id = ?");
+                $assetStmt->execute([$maintenance['asset_id']]);
+                $asset = $assetStmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($asset) {
+                    // Improve quality multiplier (cap at 1.0 = 100%)
+                    $newMultiplier = min(1.0, ($asset['quality_multiplier'] ?? 1.0) + 0.1);
+                    $updateAsset = $conn->prepare("UPDATE asset_management SET quality_multiplier = ?, last_maintenance_date = NOW() WHERE id = ?");
+                    $updateAsset->execute([$newMultiplier, $asset['id']]);
+                }
+            }
 
             json_response(['status' => 'success', 'message' => 'Maintenance record updated']);
             break;

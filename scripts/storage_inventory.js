@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${item.stock_status === 'Low' || item.stock_status === 'Critical' ? `<button onclick="requestSupply(${item.id}, '${item.product_name}', '${item.sku}', ${item.current_stock})" class="bg-orange-500 text-white px-2 py-1 rounded text-xs hover:bg-orange-600" title="Request Supplies">
                         <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     </button>` : ''}
-                    <button onclick="deleteItem(${item.id})" class="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700" title="Delete">
+                    <button onclick="archiveItem(${item.id})" class="bg-orange-600 text-white px-2 py-1 rounded text-xs hover:bg-orange-700" title="Archive">
                         <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                     </button>
                 </td>
@@ -110,18 +110,18 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal();
     }
 
-    async function deleteItem(id) {
-        if (!confirm('Delete this item?')) return;
+    async function archiveItem(id) {
+        if (!confirm('Archive this item?')) return;
         try {
-            const res = await fetch('../api/storage_inventory.php', { method: 'DELETE', body: JSON.stringify({ id }) });
+            const res = await fetch('../api/archive_management.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ archive_type: 'storage_inventory', item_id: id, original_table: 'storage_inventory', reason: 'Archived from storage inventory' }) });
             const data = await res.json();
             if (data.status === 'success') {
-                Toastify({ text: 'Item deleted', duration: 2500, gravity: 'top', position: 'right', backgroundColor: '#10b981' }).showToast();
+                Toastify({ text: 'Item archived', duration: 2500, gravity: 'top', position: 'right', backgroundColor: '#10b981' }).showToast();
                 fetchItems();
-            } else throw new Error(data.message || 'Delete failed');
+            } else throw new Error(data.message || 'Archive failed');
         } catch (err) {
             console.error(err);
-            Toastify({ text: 'Error deleting item', duration: 3000, gravity: 'top', position: 'right', backgroundColor: '#ef4444' }).showToast();
+            Toastify({ text: 'Error archiving item', duration: 3000, gravity: 'top', position: 'right', backgroundColor: '#ef4444' }).showToast();
         }
     }
 
@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    window.deleteItem = deleteItem;
+    window.archiveItem = archiveItem;
     window.editItem = editItem;
     window.requestSupply = requestSupply;
 

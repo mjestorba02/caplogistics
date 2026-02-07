@@ -59,10 +59,25 @@ try {
         status ENUM('Active', 'Inactive', 'Maintenance', 'Retired') DEFAULT 'Active',
         purchase_date DATE NULL,
         lifespan_years INT DEFAULT 5,
+        last_maintenance_date DATETIME NULL,
+        quality_multiplier FLOAT DEFAULT 1.0,
         date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         INDEX idx_item_number (item_number),
         INDEX idx_status (status)
     )");
+
+    // Add new columns if they don't exist
+    try {
+        $conn->exec("ALTER TABLE asset_management ADD COLUMN last_maintenance_date DATETIME NULL");
+    } catch (Exception $e) {
+        // Column already exists, ignore
+    }
+
+    try {
+        $conn->exec("ALTER TABLE asset_management ADD COLUMN quality_multiplier FLOAT DEFAULT 1.0");
+    } catch (Exception $e) {
+        // Column already exists, ignore
+    }
 
     switch ($method) {
         case 'GET':
@@ -87,25 +102,43 @@ try {
             $sql = "
                 SELECT *,
                     CASE 
-                        WHEN purchase_date IS NULL THEN 100
+                        WHEN EXISTS (
+                            SELECT 1 FROM asset_maintenance 
+                            WHERE asset_management.id = asset_maintenance.asset_id 
+                            AND asset_maintenance.status IN ('Scheduled')
+                        ) THEN 0
                         ELSE GREATEST(
                             0,
                             ROUND(
-                                100 - (
-                                    (TIMESTAMPDIFF(DAY, purchase_date, CURDATE()) 
-                                    / (lifespan_years * 365)) * 100
-                                )
+                                (100 - (
+                                    (TIMESTAMPDIFF(DAY, COALESCE(purchase_date, CURDATE()), CURDATE()) 
+                                    / (COALESCE(lifespan_years, 5) * 365)) * 100
+                                )) * COALESCE(quality_multiplier, 1.0)
                             )
                         )
-                    END AS quality_percent
+                    END AS quality_percent,
+                    CASE 
+                        WHEN EXISTS (
+                            SELECT 1 FROM asset_maintenance 
+                            WHERE asset_management.id = asset_maintenance.asset_id 
+                            AND asset_maintenance.status IN ('Scheduled')
+                        ) THEN 'Maintenance'
+                        ELSE status
+                    END AS actual_status
                 FROM asset_management
                 $where
                 ORDER BY date DESC
                 ";
             $stmt = $conn->prepare($sql);
             $stmt->execute($params);
+            
+            $assets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($assets as &$asset) {
+                $asset['status'] = $asset['actual_status'];
+                unset($asset['actual_status']);
+            }
 
-            json_response(['status' => 'success', 'assets' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+            json_response(['status' => 'success', 'assets' => $assets]);
             break;
 
         case 'POST':
@@ -148,6 +181,8 @@ try {
             $item_code = trim($input['item_code'] ?? '');
             $item_name = trim($input['item_name'] ?? '');
             $status = $input['status'] ?? 'Active';
+            $purchase_date = $input['purchase_date'] ?? null;
+            $lifespan_years = $input['lifespan_years'] ?? 5;
 
             if (empty($id) || empty($item_number)) {
                 json_response(['status' => 'error', 'message' => 'ID and item number are required'], 400);
@@ -157,7 +192,7 @@ try {
                 SET item_number=?, image=?, type_of_asset=?, item_code=?, item_name=?, status=?, purchase_date=?, lifespan_years=?
                 WHERE id=?";
             $stmt = $conn->prepare($sql);
-            $stmt->execute([$item_number, $image, $type_of_asset, $item_code, $item_name, $status, $id]);
+            $stmt->execute([$item_number, $image, $type_of_asset, $item_code, $item_name, $status, $purchase_date, $lifespan_years, $id]);
 
             json_response(['status' => 'success', 'message' => 'Asset updated successfully']);
             break;

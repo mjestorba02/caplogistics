@@ -29,7 +29,7 @@ function renderProjects(projects) {
             <td class="px-6 py-4"><span class="bg-blue-200 text-blue-800 px-2 py-1 rounded">${p.project_status}</span></td>
             <td class="px-6 py-4">
                 <button onclick="editProject(${p.id})" class="text-blue-600 hover:text-blue-800 mr-2">Edit</button>
-                <button onclick="deleteProject(${p.id})" class="text-red-600 hover:text-red-800">Delete</button>
+                <button onclick="archiveProject(${p.id})" class="text-orange-600 hover:text-orange-800">Archive</button>
             </td>
         </tr>
     `).join('') || '<tr><td colspan="7" class="px-6 py-4 text-center text-gray-500">No projects found</td></tr>';
@@ -98,17 +98,17 @@ async function editProject(id) {
     } catch (error) { Toastify({ text: 'Error loading project', backgroundColor: '#ff4757' }).showToast(); }
 }
 
-async function deleteProject(id) {
+async function archiveProject(id) {
     if (!confirm('Are you sure?')) return;
     try {
-        const response = await fetch('../api/project_requirement_planning.php', {
-            method: 'DELETE',
+        const response = await fetch('../api/archive_management.php', {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id })
+            body: JSON.stringify({ archive_type: 'project', item_id: id, original_table: 'project_requirement_planning', reason: 'Archived from project planning' })
         });
         const data = await response.json();
         if (data.status === 'success') {
-            Toastify({ text: 'Project deleted', backgroundColor: '#2ed573' }).showToast();
+            Toastify({ text: 'Project archived', backgroundColor: '#2ed573' }).showToast();
             loadProjects();
         } else throw new Error(data.message);
     } catch (error) { Toastify({ text: error.message, backgroundColor: '#ff4757' }).showToast(); }

@@ -54,7 +54,30 @@ try {
     switch ($method) {
         case 'GET':
             if (isset($_GET['action']) && $_GET['action'] === 'report') {
-                // Generate report
+                // ============================================================
+                // VERIFY PASSWORD BEFORE GENERATING REPORT
+                // ============================================================
+                if (!isset($_GET['password'])) {
+                    json_response([
+                        'status' => 'password_required',
+                        'message' => 'Password verification required to generate report'
+                    ], 401);
+                }
+
+                // Get user password from session
+                $user_id = $_SESSION['id'];
+                $stmt = $conn->prepare("SELECT password FROM users WHERE id = ?");
+                $stmt->execute([$user_id]);
+                $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if (!$user || !password_verify($_GET['password'], $user['password'])) {
+                    json_response([
+                        'status' => 'error',
+                        'message' => 'Incorrect password. Report generation denied.'
+                    ], 401);
+                }
+
+                // Password verified, generate report
                 $dateFrom = $_GET['date_from'] ?? '';
                 $dateTo = $_GET['date_to'] ?? '';
 

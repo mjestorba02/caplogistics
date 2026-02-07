@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <td class="px-6 py-3 text-sm">${a.assignment_date || 'N/A'}</td>
         <td class="px-6 py-3"><span class="px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-800">${a.status}</span></td>
         <td class="px-6 py-3 text-sm">${a.custodian_acknowledged ? 'Yes' : 'No'}</td>
-        <td class="px-6 py-3 flex gap-2"><button onclick='editDeployment(${JSON.stringify(a).replace(/"/g, '&quot;')})' class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700">Edit</button><button onclick="deleteDeployment(${a.id})" class="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700">Delete</button></td>
+        <td class="px-6 py-3 flex gap-2"><button onclick='editDeployment(${JSON.stringify(a).replace(/"/g, '&quot;')})' class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700">Edit</button><button onclick="archiveDeployment(${a.id})" class="bg-orange-600 text-white px-3 py-1 rounded text-xs hover:bg-orange-700">Archive</button></td>
       </tr>`;
       })
       .join('');
@@ -94,20 +94,20 @@ document.addEventListener('DOMContentLoaded', () => {
     openModal();
   }
 
-  async function deleteDeployment(id) {
-    if (!confirm('Delete this deployment?')) return;
+  async function archiveDeployment(id) {
+    if (!confirm('Archive this deployment?')) return;
     try {
-      const res = await fetch(`../api/asset_deployment_lifecycle.php?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+      const res = await fetch('../api/archive_management.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ archive_type: 'asset_deployment', item_id: id, original_table: 'asset_deployment_lifecycle', reason: 'Archived from deployment' }) });
       const data = await res.json();
-      if (res.ok && data.status === 'success') {
-        Toastify({ text: 'Deployment deleted', duration: 3000, gravity: 'top', position: 'right', backgroundColor: 'linear-gradient(to right, #16a34a, #86efac)' }).showToast();
+      if (data.status === 'success') {
+        Toastify({ text: 'Deployment archived', duration: 3000, gravity: 'top', position: 'right', backgroundColor: 'linear-gradient(to right, #16a34a, #86efac)' }).showToast();
         fetchDeployments();
       } else {
-        throw new Error(data.message || 'Delete failed');
+        throw new Error(data.message || 'Archive failed');
       }
     } catch (err) {
       console.error(err);
-      Toastify({ text: 'Error: ' + (err.message || 'Delete failed'), duration: 5000, gravity: 'top', position: 'right', backgroundColor: 'linear-gradient(to right, #ef4444, #ef9a9a)' }).showToast();
+      Toastify({ text: 'Error: ' + (err.message || 'Archive failed'), duration: 5000, gravity: 'top', position: 'right', backgroundColor: 'linear-gradient(to right, #ef4444, #ef9a9a)' }).showToast();
     }
   }
 
@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
   applyFilterBtn?.addEventListener('click', () => fetchDeployments(document.getElementById('filterInput').value));
   clearFilterBtn?.addEventListener('click', () => { document.getElementById('filterInput').value = ''; fetchDeployments(); });
 
-  window.deleteDeployment = deleteDeployment;
+  window.archiveDeployment = archiveDeployment;
   window.editDeployment = editDeployment;
 
   loadAssets();

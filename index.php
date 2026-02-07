@@ -64,21 +64,39 @@
   </div>
 
   <!-- OTP Modal -->
-  <div class="fixed inset-0 bg-gray-900/70 flex justify-center items-center hidden" id="otpModal">
-    <div class="bg-white rounded-xl shadow-lg w-[350px] p-6 relative">
-      <div class="mb-4">
-        <h5 class="text-xl font-semibold text-gray-900">Enter OTP</h5>
-        <button type="button" class="absolute top-3 right-3 text-gray-500 hover:text-gray-800" id="closeOtpModal">
-          <i class="fa-solid fa-xmark fa-lg"></i>
+  <div class="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center hidden z-50" id="otpModal">
+    <div class="bg-white rounded-2xl shadow-2xl w-[400px] p-8 relative">
+      <button type="button" class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl" id="closeOtpModal">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="fa-solid fa-shield-halved text-indigo-600 text-2xl"></i>
+        </div>
+        <h5 class="text-2xl font-bold text-gray-900">Verify Your Identity</h5>
+        <p class="text-gray-600 text-sm mt-2">An OTP has been sent to your email</p>
+      </div>
+
+      <div class="mb-6">
+        <label for="otp" class="block mb-3 text-sm font-medium text-gray-700">Enter OTP Code</label>
+        <input type="text" id="otp" maxlength="6" class="w-full p-4 text-center text-2xl border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 outline-none tracking-widest font-mono" placeholder="000000" required>
+        <p class="text-gray-500 text-xs mt-2">Check your email inbox for the 6-digit code</p>
+      </div>
+
+      <div class="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+        <p class="text-xs text-blue-800"><strong>Note:</strong> OTP expires in 10 minutes</p>
+      </div>
+
+      <div class="flex gap-3">
+        <button type="button" class="flex-1 bg-gray-200 text-gray-800 px-4 py-3 rounded-lg hover:bg-gray-300 font-medium transition" id="closeOtpModalBtn">Cancel</button>
+        <button type="button" class="flex-1 bg-indigo-600 text-white px-4 py-3 rounded-lg hover:bg-indigo-700 font-medium transition flex justify-center items-center" id="verifyOtpBtn">
+          <span id="verifyOtpBtnText">Verify</span>
+          <svg id="verifyOtpSpinner" class="w-4 h-4 ml-2 text-white animate-spin hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
         </button>
-      </div>
-      <div class="mb-3">
-        <label for="otp" class="block mb-2 text-sm font-medium text-gray-700">OTP Code</label>
-        <input type="text" id="otp" class="w-full p-3 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300" placeholder="Enter OTP sent to your email">
-      </div>
-      <div class="flex justify-end gap-3 mt-4">
-        <button type="button" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300" id="closeOtpModalBtn">Close</button>
-        <button type="button" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700" id="verifyOtpBtn">Verify OTP</button>
       </div>
     </div>
   </div>
@@ -101,6 +119,13 @@
   const loginBtn = document.getElementById('loginBtn');
   const loginBtnText = document.getElementById('loginBtnText');
   const loginSpinner = document.getElementById('loginSpinner');
+  const otpModal = document.getElementById('otpModal');
+  const otpInput = document.getElementById('otp');
+  const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+  const verifyOtpBtnText = document.getElementById('verifyOtpBtnText');
+  const verifyOtpSpinner = document.getElementById('verifyOtpSpinner');
+  const closeOtpModalBtn = document.getElementById('closeOtpModalBtn');
+  const closeOtpModal = document.getElementById('closeOtpModal');
 
   // Toggle password visibility
   document.getElementById('togglePassword').addEventListener('click', function() {
@@ -110,6 +135,29 @@
     passwordInput.type = isPassword ? 'text' : 'password';
     icon.classList.toggle('fa-eye', !isPassword);
     icon.classList.toggle('fa-eye-slash', isPassword);
+  });
+
+  // Close OTP modal
+  function closeOTPModal() {
+    otpModal.classList.add('hidden');
+    otpModal.style.display = 'none';
+    document.body.classList.remove('overflow-hidden');
+    otpInput.value = '';
+  }
+
+  closeOtpModalBtn.addEventListener('click', closeOTPModal);
+  closeOtpModal.addEventListener('click', closeOTPModal);
+
+  // Allow only numbers in OTP input
+  otpInput.addEventListener('input', function() {
+    this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);
+  });
+
+  // Verify OTP on Enter key
+  otpInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      verifyOtpBtn.click();
+    }
   });
 
   // Login form submission
@@ -129,29 +177,84 @@
     loginSpinner.classList.remove('hidden');
 
     try {
-      const response = await fetch('https://log1.imarketph.com/api/auth.php', {
+      const response = await fetch('api/auth.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ action: 'login', email, password })
       });
 
       const data = await response.json();
+      console.log('Login response:', data);
+      console.log('[DEBUG] Response status:', data.status);
+      console.log('[DEBUG] Redirect URL:', data.redirect_url);
+      console.log('[DEBUG] Response full:', JSON.stringify(data, null, 2));
 
-      if (data.status === 'success') {
+      if (data.status === 'otp_required') {
+        // Show OTP toast and redirect to OTP verification page
+        const sender = data.sender_name || 'E-Commerce Logistics Management Portal';
+        showToast(`OTP sent to your email.`, 'success');
+        
+        // Direct hard redirect to OTP verification page after 500ms
+        setTimeout(() => {
+          window.location.href = 'pages/otp_verify.php';
+        }, 1000);
+      } else if (data.status === 'success') {
         showToast(data.message, 'success');
         setTimeout(() => {
           window.location.href = 'pages/warehouse_analytics.php';
         }, 1500);
       } else {
-        showToast(data.message, 'error');
+        showToast(data.message || 'Login failed', 'error');
       }
     } catch (err) {
-      console.error(err);
+      console.error('[ERROR] Login request failed:', err);
       showToast('Login failed. Please try again.', 'error');
     } finally {
       loginBtn.disabled = false;
       loginBtnText.textContent = 'Login';
       loginSpinner.classList.add('hidden');
+    }
+  });
+
+  // Verify OTP
+  verifyOtpBtn.addEventListener('click', async function() {
+    const otp = otpInput.value.trim();
+
+    if (!otp || otp.length !== 6) {
+      showToast('Please enter a valid 6-digit OTP', 'error');
+      return;
+    }
+
+    verifyOtpBtn.disabled = true;
+    verifyOtpBtnText.textContent = 'Verifying...';
+    verifyOtpSpinner.classList.remove('hidden');
+
+    try {
+      const response = await fetch('api/auth.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'verify_otp', otp_code: otp })
+      });
+
+      const data = await response.json();
+      console.log('OTP verification response:', data);
+
+      if (data.status === 'success') {
+        showToast('OTP verified! Redirecting...', 'success');
+        closeOTPModal();
+        setTimeout(() => {
+          window.location.href = 'pages/warehouse_analytics.php';
+        }, 1500);
+      } else {
+        showToast(data.message || 'OTP verification failed', 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('OTP verification failed. Please try again.', 'error');
+    } finally {
+      verifyOtpBtn.disabled = false;
+      verifyOtpBtnText.textContent = 'Verify';
+      verifyOtpSpinner.classList.add('hidden');
     }
   });
 </script>

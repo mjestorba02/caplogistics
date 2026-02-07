@@ -71,7 +71,7 @@ switch ($method) {
     case "GET":
         if (isset($data['id'])) {
             $id = intval($data['id']);
-            $stmt = $conn->prepare("SELECT *, CONCAT('https://log1.imarketph.com/uploads/products/', product_photo) as product_photo_url FROM inventory_items WHERE id = ?");
+            $stmt = $conn->prepare("SELECT *, CONCAT('http://localhost/caplog1/uploads/products/', product_photo) as product_photo_url FROM inventory_items WHERE id = ?");
             $stmt->execute([$id]);
             $item = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($item) {
@@ -81,7 +81,7 @@ switch ($method) {
                 echo json_encode(["error" => "Item not found"]);
             }
         } else {
-            $stmt = $conn->query("SELECT *, CONCAT('https://log1.imarketph.com/uploads/products/', product_photo) as product_photo_url FROM inventory_items ORDER BY created_at DESC");
+            $stmt = $conn->query("SELECT *, CONCAT('http://localhost/caplog1/uploads/products/', product_photo) as product_photo_url FROM inventory_items ORDER BY created_at DESC");
             $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
             echo json_encode($items);
         }

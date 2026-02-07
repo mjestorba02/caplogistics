@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td class="px-6 py-3 text-sm">${a.serial_number || 'N/A'}</td>
                 <td class="px-6 py-3"><span class="px-2 py-1 rounded text-xs font-semibold bg-blue-100 text-blue-800">${a.status}</span></td>
                 <td class="px-6 py-3 text-sm">${a.registration_date || 'N/A'}</td>
-                <td class="px-6 py-3 flex gap-2"><button onclick='editAsset(${JSON.stringify(a).replace(/"/g, '&quot;')})' class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700">Edit</button><button onclick="deleteAsset(${a.id})" class="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700">Delete</button></td>
+                <td class="px-6 py-3 flex gap-2"><button onclick='editAsset(${JSON.stringify(a).replace(/"/g, '&quot;')})' class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700">Edit</button><button onclick="archiveAsset(${a.id})" class="bg-orange-600 text-white px-3 py-1 rounded text-xs hover:bg-orange-700">Archive</button></td>
             </tr>
         `).join('');
     }
@@ -92,18 +92,18 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal();
     }
 
-    async function deleteAsset(id) {
-        if (!confirm('Delete this asset?')) return;
+    async function archiveAsset(id) {
+        if (!confirm('Archive this asset?')) return;
         try {
-            const res = await fetch(`../api/asset_onboarding_registration.php?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+            const res = await fetch('../api/archive_management.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ archive_type: 'asset_onboarding', item_id: id, original_table: 'asset_onboarding_registration', reason: 'Archived from onboarding' }) });
             const data = await res.json();
-            if (res.ok && data.status === 'success') {
-                Toastify({ text: 'Asset deleted', duration: 3000, gravity: 'top', position: 'right', backgroundColor: 'linear-gradient(to right, #16a34a, #86efac)' }).showToast();
+            if (data.status === 'success') {
+                Toastify({ text: 'Asset archived', duration: 3000, gravity: 'top', position: 'right', backgroundColor: 'linear-gradient(to right, #16a34a, #86efac)' }).showToast();
                 fetchAssets();
-            } else throw new Error(data.message || 'Delete failed');
+            } else throw new Error(data.message || 'Archive failed');
         } catch (err) {
             console.error(err);
-            Toastify({ text: 'Error deleting asset', duration: 4000, gravity: 'top', position: 'right', backgroundColor: 'linear-gradient(to right, #ef4444, #ef9a9a)' }).showToast();
+            Toastify({ text: 'Error archiving asset', duration: 4000, gravity: 'top', position: 'right', backgroundColor: 'linear-gradient(to right, #ef4444, #ef9a9a)' }).showToast();
         }
     }
 
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
     applyFilterBtn.addEventListener('click', () => fetchAssets(document.getElementById('filterInput').value));
     clearFilterBtn.addEventListener('click', () => { document.getElementById('filterInput').value = ''; fetchAssets(); });
 
-    window.deleteAsset = deleteAsset;
+    window.archiveAsset = archiveAsset;
     window.editAsset = editAsset;
 
     loadReceivingRecords();

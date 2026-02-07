@@ -38,7 +38,7 @@ STEP 1: Import Database (2 minutes)
 
 STEP 2: Access Portal (1 minute)
   ↓
-  https://log1.imarketph.com/pages/vendor_portal.php
+  http://localhost/caplog1/pages/vendor_portal.php
 
 STEP 3: Start Using (Immediately)
   ↓
@@ -216,7 +216,7 @@ RIGHT NOW:
 
 IN 5 MINUTES:
   3. Import database: vendor_portal_tables.sql
-  4. Visit: https://log1.imarketph.com/pages/vendor_portal.php
+  4. Visit: http://localhost/caplog1/pages/vendor_portal.php
 
 IN 15 MINUTES:
   5. Register a test vendor

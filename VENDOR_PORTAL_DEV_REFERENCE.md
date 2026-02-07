@@ -373,7 +373,7 @@ Browser DevTools → Console tab
 
 ### Test API Directly
 ```bash
-curl -X GET "https://log1.imarketph.com/api/vendor_portal.php?action=get_vendors"
+curl -X GET "http://localhost/caplog1/api/vendor_portal.php?action=get_vendors"
 ```
 
 ---
@@ -451,13 +451,13 @@ SHOW INDEX FROM vendor_portal_registration;
 ### API Testing
 ```bash
 # Test endpoint exists
-curl https://log1.imarketph.com/api/vendor_portal.php
+curl http://localhost/caplog1/api/vendor_portal.php
 
 # Get vendors
-curl "https://log1.imarketph.com/api/vendor_portal.php?action=get_vendors"
+curl "http://localhost/caplog1/api/vendor_portal.php?action=get_vendors"
 
 # Get with filter
-curl "https://log1.imarketph.com/api/vendor_portal.php?action=get_vendors&status=Approved"
+curl "http://localhost/caplog1/api/vendor_portal.php?action=get_vendors&status=Approved"
 ```
 
 ---

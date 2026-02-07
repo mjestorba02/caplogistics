@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['id'])) { header('Location: https://log1.imarketph.com'); exit(); }
+if (!isset($_SESSION['id'])) { header('Location: http://localhost/caplog1'); exit(); }
 include '../layout/adminLayout.php';
 
 $children = <<<'HTML'
@@ -71,7 +71,7 @@ $children = <<<'HTML'
 </div>
 
 <script>
-const API = 'https://log1.imarketph.com/api/invoices.php';
+const API = 'http://localhost/caplog1/api/invoices.php';
 async function fetchInvoices(q=''){
   const url = new URL(API, location.origin);
   const resp = await fetch(url.toString(), { credentials: 'same-origin' });
@@ -82,7 +82,7 @@ async function fetchInvoices(q=''){
 
 function renderRow(inv){
   const deliveryRoute = `${inv.delivery_from || ''} → ${inv.delivery_to || ''}`;
-  return `<tr class="border-b border-gray-200 hover:bg-blue-50 transition-colors duration-200"><td class="p-4 font-medium text-gray-900">${inv.invoice_number||''}</td><td class="p-4 text-gray-700">${inv.user_name||''}</td><td class="p-4 text-gray-700">${deliveryRoute}</td><td class="p-4 text-gray-700">${inv.date||''}</td><td class="p-4 text-gray-700">${inv.due_date||''}</td><td class="p-4 font-semibold text-green-600">₱${Number(inv.subtotal||0).toFixed(2)}</td><td class="p-4"><div class="flex space-x-2"><button data-id="${inv.id}" class="viewBtn inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition-all duration-200 transform hover:scale-105" title="View Invoice"><svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>View</button><button data-id="${inv.id}" class="editBtn inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 hover:bg-green-200 rounded-lg transition-all duration-200 transform hover:scale-105" title="Edit Invoice"><svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>Edit</button><button data-id="${inv.id}" class="delBtn inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-700 bg-red-100 hover:bg-red-200 rounded-lg transition-all duration-200 transform hover:scale-105" title="Delete Invoice"><svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>Delete</button></div></td></tr>`;
+  return `<tr class="border-b border-gray-200 hover:bg-blue-50 transition-colors duration-200"><td class="p-4 font-medium text-gray-900">${inv.invoice_number||''}</td><td class="p-4 text-gray-700">${inv.user_name||''}</td><td class="p-4 text-gray-700">${deliveryRoute}</td><td class="p-4 text-gray-700">${inv.date||''}</td><td class="p-4 text-gray-700">${inv.due_date||''}</td><td class="p-4 font-semibold text-green-600">₱${Number(inv.subtotal||0).toFixed(2)}</td><td class="p-4"><div class="flex space-x-2"><button data-id="${inv.id}" class="viewBtn inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition-all duration-200 transform hover:scale-105" title="View Invoice"><svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>View</button><button data-id="${inv.id}" class="editBtn inline-flex items-center px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 hover:bg-green-200 rounded-lg transition-all duration-200 transform hover:scale-105" title="Edit Invoice"><svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>Edit</button><button data-id="${inv.id}" class="archBtn inline-flex items-center px-3 py-1.5 text-sm font-medium text-yellow-700 bg-yellow-100 hover:bg-yellow-200 rounded-lg transition-all duration-200 transform hover:scale-105" title="Archive Invoice"><svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>Archive</button></div></td></tr>`;
 }
 
 async function loadAndRender(){
@@ -116,10 +116,11 @@ async function loadAndRender(){
     document.getElementById('notes').value = inv.notes||'';
     document.getElementById('editModal').classList.remove('hidden');
   }));
-  document.querySelectorAll('.delBtn').forEach(b=>b.addEventListener('click', async e=>{
-    if (!confirm('Delete invoice?')) return;
+  document.querySelectorAll('.archBtn').forEach(b=>b.addEventListener('click', async e=>{
+    if (!confirm('Archive invoice? It will be removable from the list but recoverable from Archive.')) return;
     const id = e.currentTarget.dataset.id;
-    const r = await fetch(API + '?id=' + encodeURIComponent(id), { method:'DELETE', credentials:'same-origin' });
+    const payload = { archive_type: 'invoice', item_id: id, original_table: 'invoices', reason: 'Archived from UI' };
+    const r = await fetch('../api/archive_management.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), credentials:'same-origin' });
     if (r.ok) { await loadAndRender(); }
   }));
 
@@ -129,7 +130,7 @@ async function loadAndRender(){
     const companyAddress = '123 Warehouse Ave, City, Country';
     const companyPhone = '+1 (555) 123-4567';
     const companyEmail = 'info@logistics1.com';
-    const logoUrl = 'https://log1.imarketph.com/images/logo.jpg'; // adjust path as needed
+    const logoUrl = 'http://localhost/caplog1/images/logo.jpg'; // adjust path as needed
     const invoiceNumber = inv.invoice_number || ('#' + (inv.id || ''));
     const date = inv.date || (inv.created_at ? inv.created_at.split(' ')[0] : '');
     const due = inv.due_date || '';

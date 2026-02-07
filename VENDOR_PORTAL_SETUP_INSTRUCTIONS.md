@@ -24,7 +24,7 @@ You should see these 5 tables in the logcap1 database:
 - vendor_ratings
 
 ## Step 5: Test the Application
-1. Open https://log1.imarketph.com/pages/vendor_portal.php
+1. Open http://localhost/caplog1/pages/vendor_portal.php
 2. Click "Add Vendor" button
 3. Fill in the form fields:
    - **Vendor Name** (required)

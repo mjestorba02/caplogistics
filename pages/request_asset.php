@@ -1,15 +1,18 @@
 <?php
 session_start();
 require_once __DIR__ . '/../layout/adminLayout.php';
+require_once __DIR__ . '/../api/department_helpers.php';
 
 $user_id = $_SESSION['id'] ?? null;
 $user_name = $_SESSION['name'] ?? 'Unknown User';
-$user_department = $_SESSION['department'] ?? 'Unknown Department';
 
 if (!$user_id) {
     header('Location: ../login.php');
     exit;
 }
+
+// Get user's department from database using helper function
+$user_department = getUserDepartment($user_id, 'Unknown Department');
 
 function renderRequestAssetPage() {
     global $user_id, $user_name, $user_department;

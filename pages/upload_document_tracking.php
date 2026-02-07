@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td class="px-6 py-3">${u.uploader_name}</td>
                 <td class="px-6 py-3"><span class="px-2 py-1 rounded text-xs font-semibold ${u.status === 'Verified' ? 'bg-green-100 text-green-800' : u.status === 'Uploaded' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'}">${u.status}</span></td>
                 <td class="px-6 py-3">${u.upload_date}</td>
-                <td class="px-6 py-3 flex gap-2"><button onclick='updateStatus(${u.id})' class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700">Update Status</button><button onclick="deleteUpload(${u.id})" class="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700">Delete</button></td>
+                <td class="px-6 py-3 flex gap-2"><button onclick='updateStatus(${u.id})' class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700">Update Status</button><button onclick="archiveUpload(${u.id})" class="bg-yellow-600 text-white px-3 py-1 rounded text-xs hover:bg-yellow-700">Archive</button></td>
             </tr>
         `).join('');
     }
@@ -169,18 +169,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function deleteUpload(id) {
-        if (!confirm('Delete this upload?')) return;
+    async function archiveUpload(id) {
+        if (!confirm('Archive this upload? It will be recoverable from Archive.')) return;
         try {
-            const res = await fetch('../api/upload_document_tracking.php', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+            const payload = { archive_type: 'document', item_id: id, original_table: 'uploaded_documents', reason: 'Archived from UI' };
+            const res = await fetch('../api/archive_management.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             const data = await res.json();
             if (data.status === 'success') {
-                Toastify({ text: 'Upload deleted', duration: 2500, gravity: 'top', position: 'right', backgroundColor: '#10b981' }).showToast();
+                Toastify({ text: 'Upload archived', duration: 2500, gravity: 'top', position: 'right', backgroundColor: '#10b981' }).showToast();
                 fetchUploads();
-            } else throw new Error(data.message || 'Delete failed');
+            } else throw new Error(data.message || 'Archive failed');
         } catch (err) {
             console.error(err);
-            Toastify({ text: 'Error deleting upload', duration: 3000, gravity: 'top', position: 'right', backgroundColor: '#ef4444' }).showToast();
+            Toastify({ text: 'Error archiving upload', duration: 3000, gravity: 'top', position: 'right', backgroundColor: '#ef4444' }).showToast();
         }
     }
 
@@ -214,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     window.updateStatus = updateStatus;
-    window.deleteUpload = deleteUpload;
+    window.archiveUpload = archiveUpload;
 
     fetchUploads();
 });

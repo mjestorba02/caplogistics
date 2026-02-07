@@ -6,6 +6,8 @@ if (!isset($_SESSION['id'])) {
 }
 include '../layout/adminLayout.php';
 
+$isAdmin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+
 $children = <<<'HTML'
 <div class="p-6">
     <div class="text-sm text-gray-600 mb-6">
@@ -74,6 +76,10 @@ $children = <<<'HTML'
 </div>
 
 <script>
+    window.isAdmin = <?php echo $isAdmin ? 'true' : 'false'; ?>;
+</script>
+
+<script>
 document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('modal');
     const closeModalBtn = document.getElementById('closeModal');
@@ -128,16 +134,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderRequests(requests) {
         emptyState.classList.add('hidden');
-        tableBody.innerHTML = requests.map(r => `
+        tableBody.innerHTML = requests.map(r => {
+            const actionButton = window.isAdmin 
+                ? `<button onclick='updateStatus(${r.id})' class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700">Update Status</button>`
+                : '<span class="text-gray-500 text-xs">No Actions</span>';
+            return `
             <tr class="border-b hover:bg-gray-50">
                 <td class="px-6 py-3">${r.id}</td>
                 <td class="px-6 py-3">${r.requester_name}</td>
                 <td class="px-6 py-3">${r.document_type}</td>
                 <td class="px-6 py-3"><span class="px-2 py-1 rounded text-xs font-semibold ${r.status === 'Approved' ? 'bg-green-100 text-green-800' : r.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' : r.status === 'Rejected' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}">${r.status}</span></td>
                 <td class="px-6 py-3">${r.request_date}</td>
-                <td class="px-6 py-3"><button onclick='updateStatus(${r.id})' class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700">Update Status</button></td>
+                <td class="px-6 py-3">${actionButton}</td>
             </tr>
-        `).join('');
+        `;
+        }).join('');
     }
 
     function updateStatus(id) {

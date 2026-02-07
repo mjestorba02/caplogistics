@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <td class="px-6 py-3 text-sm">${a.scheduled_date || 'N/A'}</td>
         <td class="px-6 py-3"><span class="px-2 py-1 rounded text-xs font-semibold bg-yellow-100 text-yellow-800">${a.status}</span></td>
         <td class="px-6 py-3 text-sm">${a.technician || 'N/A'}</td>
-        <td class="px-6 py-3 flex gap-2"><button onclick='editMaintenance(${JSON.stringify(a).replace(/"/g, '&quot;')})' class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700">Edit</button><button onclick="deleteMaintenance(${a.id})" class="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700">Delete</button></td>
+        <td class="px-6 py-3 flex gap-2"><button onclick='editMaintenance(${JSON.stringify(a).replace(/"/g, '&quot;')})' class="bg-indigo-600 text-white px-3 py-1 rounded text-xs hover:bg-indigo-700">Edit</button><button onclick="archiveMaintenance(${a.id})" class="bg-orange-600 text-white px-3 py-1 rounded text-xs hover:bg-orange-700">Archive</button></td>
       </tr>`)
       .join('');
   }
@@ -93,20 +93,20 @@ document.addEventListener('DOMContentLoaded', () => {
     openModal();
   }
 
-  async function deleteMaintenance(id) {
-    if (!confirm('Delete this maintenance record?')) return;
+  async function archiveMaintenance(id) {
+    if (!confirm('Archive this maintenance record?')) return;
     try {
-      const res = await fetch(`../api/asset_maintenance_servicing.php?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+      const res = await fetch('../api/archive_management.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ archive_type: 'asset_maintenance', item_id: id, original_table: 'asset_maintenance_servicing', reason: 'Archived from maintenance' }) });
       const data = await res.json();
-      if (res.ok && data.status === 'success') {
-        Toastify({ text: 'Maintenance deleted', duration: 3000, gravity: 'top', position: 'right', backgroundColor: 'linear-gradient(to right, #16a34a, #86efac)' }).showToast();
+      if (data.status === 'success') {
+        Toastify({ text: 'Maintenance archived', duration: 3000, gravity: 'top', position: 'right', backgroundColor: 'linear-gradient(to right, #16a34a, #86efac)' }).showToast();
         fetchMaintenance();
       } else {
-        throw new Error(data.message || 'Delete failed');
+        throw new Error(data.message || 'Archive failed');
       }
     } catch (err) {
       console.error(err);
-      alert('Error deleting maintenance: ' + (err.message || err));
+      alert('Error archiving maintenance: ' + (err.message || err));
     }
   }
 
@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
   applyFilterBtn?.addEventListener('click', () => fetchMaintenance(document.getElementById('filterInput').value));
   clearFilterBtn?.addEventListener('click', () => { document.getElementById('filterInput').value = ''; fetchMaintenance(); });
 
-  window.deleteMaintenance = deleteMaintenance;
+  window.archiveMaintenance = archiveMaintenance;
   window.editMaintenance = editMaintenance;
 
   loadAssets();
