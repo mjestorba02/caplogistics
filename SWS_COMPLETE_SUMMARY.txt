@@ -203,7 +203,7 @@ All files are already created and ready!
 STEP 3: TEST IN BROWSER
 ─────────────────────────
 
-1. Open: http://localhost/caplog1
+1. Open: https://log1.imarketph.com
 2. Log in with your credentials
 3. Look at left sidebar → "Smart Warehousing"
 4. Click each module:

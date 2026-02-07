@@ -54,7 +54,7 @@
    → Click GO
 
 ⚡ STEP 4: Verify Setup
-   → Go to http://localhost/caplog1/pages/supplier_identification.php
+   → Go to https://log1.imarketph.com/pages/supplier_identification.php
    → You should see 3 suppliers in the table
    → Try clicking "Add Supplier" and create a new one
 
@@ -64,7 +64,7 @@
 
 QUICK TEST:
 ───────────
-1. Visit: http://localhost/caplog1/pages/supplier_identification.php
+1. Visit: https://log1.imarketph.com/pages/supplier_identification.php
 2. Click: "Add Supplier" button
 3. Fill form with:
    - Name: Test Company

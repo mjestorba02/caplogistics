@@ -79,7 +79,7 @@ WHERE TO EXECUTE:
 ✅ AFTER EXECUTING SQL - TEST THE FEATURE:
 ─────────────────────────────────────────────────────────────────────────────
 
-1. Go to: http://localhost/caplog1/pages/supplier_identification.php
+1. Go to: https://log1.imarketph.com/pages/supplier_identification.php
 2. You should see 3 suppliers displayed (from sample data)
 3. Click "Add Supplier" button
 4. Fill in the form:
@@ -123,18 +123,18 @@ Indexes:
 🔄 API ENDPOINTS (Working Now):
 ─────────────────────────────────────────────────────────────────────────────
 
-GET  http://localhost/caplog1/api/supplier_identification.php
+GET  https://log1.imarketph.com/api/supplier_identification.php
      Returns: All suppliers
 
-POST http://localhost/caplog1/api/supplier_identification.php
+POST https://log1.imarketph.com/api/supplier_identification.php
      Data: {supplier_name, contact_email, certifications[], risk_level, phone, notes}
      Returns: Success/error
 
-PUT  http://localhost/caplog1/api/supplier_identification.php
+PUT  https://log1.imarketph.com/api/supplier_identification.php
      Data: {id, supplier_name, contact_email, certifications[], risk_level, phone, notes}
      Returns: Success/error
 
-DELETE http://localhost/caplog1/api/supplier_identification.php
+DELETE https://log1.imarketph.com/api/supplier_identification.php
        Data: {id}
        Returns: Success/error
 

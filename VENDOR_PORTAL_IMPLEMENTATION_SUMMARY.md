@@ -155,7 +155,7 @@ A comprehensive **Vendor Portal** system for managing supplier/vendor lifecycle 
 
 2. **Access Portal**
    ```
-   http://localhost/caplog1/pages/vendor_portal.php
+   https://log1.imarketph.com/pages/vendor_portal.php
    ```
 
 3. **Start Using**
@@ -389,7 +389,7 @@ SELECT COUNT(*) FROM vendor_portal_registration;
 
 ### API Testing
 ```bash
-curl http://localhost/caplog1/api/vendor_portal.php?action=get_vendors
+curl https://log1.imarketph.com/api/vendor_portal.php?action=get_vendors
 ```
 
 ---

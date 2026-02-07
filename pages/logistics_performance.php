@@ -2,7 +2,7 @@
 session_start(); 
 
 if (!isset($_SESSION['id'])) {
-    header('Location:http://localhost/caplog1');
+    header('Location:https://log1.imarketph.com');
     exit();
 }
 include '../layout/adminLayout.php';
@@ -118,7 +118,7 @@ $children = <<<'HTML'
 
 <script>
 (function(){
-    const API_URL = 'http://localhost/caplog1/api/shipments.php';
+    const API_URL = 'https://log1.imarketph.com/api/shipments.php';
     const thresholdDaysDelayed = 7; // consider delayed if in transit more than this many days
 
     const refreshBtn = document.getElementById('refreshBtn');

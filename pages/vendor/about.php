@@ -438,9 +438,9 @@
             const wishCountEl = document.getElementById('navWishlistCount');
             const profileImg = document.getElementById('navProfileImg');
 
-            const cartApi = 'http://localhost/caplog1/api/cart.php';
-            const wishlistApi = 'http://localhost/caplog1/api/wishlist.php';
-            const profileApi = 'http://localhost/caplog1/api/profile.php';
+            const cartApi = 'https://log1.imarketph.com/api/cart.php';
+            const wishlistApi = 'https://log1.imarketph.com/api/wishlist.php';
+            const profileApi = 'https://log1.imarketph.com/api/profile.php';
 
             async function refreshCounts(){
                 try{
@@ -459,7 +459,7 @@
                     if (!r.ok) return;
                     const d = await r.json();
                     if (d.status === 'success' && d.data && d.data.profile_image){
-                        profileImg.src = 'http://localhost/caplog1/uploads/' + d.data.profile_image;
+                        profileImg.src = 'https://log1.imarketph.com/uploads/' + d.data.profile_image;
                     }
                 }catch(e){ /* noop */ }
             }

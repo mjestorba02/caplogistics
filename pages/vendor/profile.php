@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['vendor_id'])) {
-    header('Location: http://localhost/caplog1/pages/vendor/login.php');
+    header('Location: https://log1.imarketph.com/pages/vendor/login.php');
     exit();
 }
 // If vendor is viewing a specific user's profile, a user_id can be provided via GET
@@ -977,7 +977,7 @@ $profile_user_id = isset($_GET['user_id']) && $_GET['user_id'] !== '' ? intval($
     
 <script>
     // API base
-    let API_BASE_URL = 'http://localhost/caplog1/api/profile.php';
+    let API_BASE_URL = 'https://log1.imarketph.com/api/profile.php';
     // If this vendor page is viewing a specific user's profile, include user_id so API returns that user's data
     (function(){
         const profileEl = document.querySelector('[data-profile-user-id]');
@@ -990,7 +990,7 @@ $profile_user_id = isset($_GET['user_id']) && $_GET['user_id'] !== '' ? intval($
     })();
 
     function buildUploadUrl(fileName) {
-        return `http://localhost/caplog1/uploads/${fileName}`;
+        return `https://log1.imarketph.com/uploads/${fileName}`;
     }
 
     function updateHero(user) {
@@ -1186,11 +1186,11 @@ $profile_user_id = isset($_GET['user_id']) && $_GET['user_id'] !== '' ? intval($
     });
     
     // Deliveries loader
-    const deliveriesApi = 'http://localhost/caplog1/api/deliveries.php';
+    const deliveriesApi = 'https://log1.imarketph.com/api/deliveries.php';
 
-    const wishlistApi = 'http://localhost/caplog1/api/wishlist.php';
-    const inventoryApi = 'http://localhost/caplog1/api/inventory.php';
-    const cartApi = 'http://localhost/caplog1/api/cart.php';
+    const wishlistApi = 'https://log1.imarketph.com/api/wishlist.php';
+    const inventoryApi = 'https://log1.imarketph.com/api/inventory.php';
+    const cartApi = 'https://log1.imarketph.com/api/cart.php';
 
     // product cache used to show real names/prices in wishlist and cart
     let allProducts = [];
@@ -1710,7 +1710,7 @@ $profile_user_id = isset($_GET['user_id']) && $_GET['user_id'] !== '' ? intval($
                 const paymentMethodEl = document.getElementById('paymentMethodSelect');
                 const paymentMethod = paymentMethodEl ? paymentMethodEl.value : 'cod';
 
-                const sr = await fetch('http://localhost/caplog1/api/shipments.php', {
+                const sr = await fetch('https://log1.imarketph.com/api/shipments.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'same-origin',
@@ -1730,7 +1730,7 @@ $profile_user_id = isset($_GET['user_id']) && $_GET['user_id'] !== '' ? intval($
                 if (!sr.ok) throw new Error(sdata.error || 'Failed to create shipment');
 
                 const deliveryNumber = 'DLV-' + Date.now();
-                const dr = await fetch('http://localhost/caplog1/api/deliveries.php', {
+                const dr = await fetch('https://log1.imarketph.com/api/deliveries.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'same-origin',
@@ -1843,7 +1843,7 @@ $profile_user_id = isset($_GET['user_id']) && $_GET['user_id'] !== '' ? intval($
         // View invoice function
         window.viewInvoice = async function(shipmentId) {
             try {
-                const r = await fetch('http://localhost/caplog1/api/invoices.php?shipment_id=' + encodeURIComponent(shipmentId), { credentials: 'same-origin' });
+                const r = await fetch('https://log1.imarketph.com/api/invoices.php?shipment_id=' + encodeURIComponent(shipmentId), { credentials: 'same-origin' });
                 if (!r.ok) throw new Error('Invoice not found');
                 const invoices = await r.json();
                 if (!Array.isArray(invoices) || invoices.length === 0) throw new Error('No invoice found for this shipment');

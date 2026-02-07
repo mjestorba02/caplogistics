@@ -42,7 +42,7 @@ Or use phpMyAdmin to import the SQL file.
 ### 2️⃣ Access Portal
 Navigate to:
 ```
-http://localhost/caplog1/pages/vendor_portal.php
+https://log1.imarketph.com/pages/vendor_portal.php
 ```
 
 ### 3️⃣ Start Using!
@@ -270,7 +270,7 @@ After setup, verify:
 mysql -u root logcap1 < vendor_portal_tables.sql
 
 # 2. Visit in browser
-http://localhost/caplog1/pages/vendor_portal.php
+https://log1.imarketph.com/pages/vendor_portal.php
 ```
 
 ### Option 2: Follow Checklist

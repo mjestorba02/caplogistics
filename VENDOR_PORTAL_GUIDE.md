@@ -166,7 +166,7 @@ caplog1/
 ```
 
 ### Step 3: Access the Vendor Portal
-Navigate to: `http://localhost/caplog1/pages/vendor_portal.php`
+Navigate to: `https://log1.imarketph.com/pages/vendor_portal.php`
 
 You must be logged in to access the portal (session-based authentication).
 
